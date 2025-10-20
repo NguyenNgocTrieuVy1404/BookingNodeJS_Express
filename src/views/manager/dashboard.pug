@@ -1,0 +1,220 @@
+extends ../layoutManager
+
+block content
+    .container-fluid.p-4
+        .welcome-section.mb-4
+            .d-flex.justify-content-between.align-items-center
+                div
+                    h1.welcome-title.mb-0
+                        | Xin chào, 
+                        span.manager-name.fw-bold= user.tenDangNhap
+                    p.welcome-subtitle.text-muted.mb-0 Chào mừng bạn đến với trang quản lý
+                .current-time#currentTime
+
+        .stats-container.row.g-4.mb-4
+            .col-md-3
+                .stat-card.h-100
+                    .stat-icon.bg-primary-subtle
+                        i.fas.fa-door-open.text-primary
+                    .stat-info
+                        h3.text-muted.fs-6 Tổng số phòng
+                        .stat-number.fw-bold.fs-4= stats.totalRooms || 0
+
+            .col-md-3
+                .stat-card.h-100
+                    .stat-icon.bg-success-subtle
+                        i.fas.fa-calendar-check.text-success
+                    .stat-info
+                        h3.text-muted.fs-6 Đặt phòng hiện tại
+                        .stat-number.fw-bold.fs-4= stats.activeBookings || 0
+
+            .col-md-3
+                .stat-card.h-100
+                    .stat-icon.bg-info-subtle
+                        i.fas.fa-check-circle.text-info
+                    .stat-info
+                        h3.text-muted.fs-6 Đã hoàn thành
+                        .stat-number.fw-bold.fs-4= stats.completedBookings || 0
+                        
+            .col-md-3
+                .stat-card.h-100
+                    .stat-icon.bg-warning-subtle
+                        i.fas.fa-coins.text-warning
+                    .stat-info
+                        h3.text-muted.fs-6 Doanh thu tháng
+                        .stat-number.fw-bold.fs-4= stats.monthlyRevenue ? stats.monthlyRevenue.toLocaleString('vi-VN') + ' đ' : '0 đ'
+
+        .row.mb-4
+            .col-lg-6.mb-4
+                .card.shadow-sm.h-100
+                    .card-header.bg-white.py-3
+                        h5.card-title.mb-0
+                            i.fas.fa-chart-pie.me-2.text-primary
+                            | Trạng thái đặt phòng
+                    .card-body
+                        .chart-container(style="position: relative; height:280px;")
+                            canvas#bookingStatusChart
+
+            .col-lg-6.mb-4
+                .card.shadow-sm.h-100
+                    .card-header.bg-white.py-3
+                        h5.card-title.mb-0
+                            i.fas.fa-chart-line.me-2.text-primary
+                            | Đặt phòng theo thời gian
+                    .card-body
+                        .chart-container(style="position: relative; height:280px;")
+                            canvas#bookingTimelineChart
+
+        .card.shadow-sm
+            .card-header.bg-white.py-3
+                h5.card-title.mb-0
+                    i.fas.fa-history.me-2.text-primary
+                    | Đặt phòng gần đây
+
+            .card-body
+                .table-responsive
+                    table.table.table-hover.align-middle.mb-0
+                        thead.table-light
+                            tr
+                                th ID
+                                th Khách hàng
+                                th Phòng
+                                th Khách sạn
+                                th Ngày bắt đầu
+                                th Ngày kết thúc
+                                th Trạng thái
+                        tbody
+                            each booking in recentBookings || []
+                                tr
+                                    td= booking.idDatPhong
+                                    td= booking.hoTen
+                                    td
+                                        if booking.idPhong
+                                            span.text-nowrap Phòng #{booking.idPhong}
+                                        else
+                                            span.text-muted.small Không xác định
+                                    td= booking.tenKhachSan
+                                    td= new Date(booking.ngayBatDau).toLocaleDateString('vi-VN')
+                                    td= new Date(booking.ngayKetThuc).toLocaleDateString('vi-VN')
+                                    td
+                                        case booking.trangThai
+                                            when 0
+                                                span.badge.bg-danger Đã hủy
+                                            when 1
+                                                span.badge.bg-primary Đang hoạt động
+                                            when 2
+                                                span.badge.bg-success Đã hoàn thành
+                                            when 3
+                                                span.badge.bg-warning Không checkin
+                                            default
+                                                span.badge.bg-secondary Không xác định
+
+    block scripts
+        // Thêm thư viện Chart.js
+        script(src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js")
+        
+        script.
+            function updateTime() {
+                const now = new Date();
+                const options = { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                };
+                document.getElementById('currentTime').textContent = 
+                    now.toLocaleDateString('vi-VN', options);
+            }
+            updateTime();
+            setInterval(updateTime, 60000);
+            
+            // Khởi tạo biểu đồ trạng thái đặt phòng
+            document.addEventListener('DOMContentLoaded', function() {
+                // Dữ liệu cho biểu đồ trạng thái
+                const statusData = {
+                    active: #{stats.activeBookings || 0},
+                    completed: #{stats.completedBookings || 0},
+                    cancelled: #{stats.cancelledBookings || 0},
+                    noShow: #{stats.noShowBookings || 0}
+                };
+                
+                // Biểu đồ tròn
+                const statusCtx = document.getElementById('bookingStatusChart').getContext('2d');
+                const statusChart = new Chart(statusCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Đang hoạt động', 'Đã hoàn thành', 'Đã hủy', 'Không checkin'],
+                        datasets: [{
+                            data: [statusData.active, statusData.completed, statusData.cancelled, statusData.noShow],
+                            backgroundColor: [
+                                '#0d6efd',  // Xanh dương - Đang hoạt động
+                                '#198754',  // Xanh lá - Đã hoàn thành
+                                '#dc3545',  // Đỏ - Đã hủy
+                                '#ffc107'   // Vàng - Không checkin
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                            }
+                        },
+                        cutout: '70%'
+                    }
+                });
+                
+                // Dữ liệu giả cho biểu đồ đường
+                // Trong thực tế bạn sẽ lấy dữ liệu này từ server
+                const timelineLabels = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12'];
+                const timelineData = {
+                    bookings: [12, 19, 8, 15, 25, 30, 35, 28, 22, 18, 25, 32]
+                };
+                
+                // Biểu đồ đường thời gian
+                const timelineCtx = document.getElementById('bookingTimelineChart').getContext('2d');
+                const timelineChart = new Chart(timelineCtx, {
+                    type: 'line',
+                    data: {
+                        labels: timelineLabels,
+                        datasets: [{
+                            label: 'Số lượng đặt phòng',
+                            data: timelineData.bookings,
+                            borderColor: '#0891b2',
+                            backgroundColor: 'rgba(8, 145, 178, 0.1)',
+                            tension: 0.4,
+                            fill: true,
+                            pointBackgroundColor: '#0891b2',
+                            pointRadius: 4,
+                            pointHoverRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    drawBorder: false
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+            });

@@ -1,0 +1,74 @@
+style.
+  footer {
+    color: #fff;
+    padding: 3rem 0;
+    margin-top: 5rem;
+  }
+
+  footer p {
+    margin-bottom: 1rem;
+    font-size: 1rem;
+  }
+
+  footer a {
+    color: rgba(255, 255, 255, 0.8) !important;
+    text-decoration: none;
+    margin: 0 1rem;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+
+  footer a:hover {
+    color: #fff !important;
+  }
+
+  footer a::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -5px;
+    left: 0;
+    background-color: #fff;
+    transition: width 0.3s ease;
+  }
+
+  footer a:hover::after {
+    width: 100%;
+  }
+
+  .social-links a {
+    margin: 0 0.5rem;
+    font-size: 1.5rem;
+    opacity: 0.8;
+    transition: all 0.3s ease;
+  }
+
+  .social-links a:hover {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+
+footer
+  .container.text-center
+    .row
+      .col-md-4.mb-4.mb-md-0
+        h5.mb-3 Về chúng tôi
+        p.mb-0 Hotel Booking - Hệ thống đặt phòng khách sạn trực tuyến hàng đầu Việt Nam
+      .col-md-4.mb-4.mb-md-0
+        h5.mb-3 Liên kết nhanh
+        div
+          a(href='/about') Về chúng tôi
+          a(href='/contact') Liên hệ
+          a(href='/privacy') Chính sách
+      .col-md-4
+        h5.mb-3 Kết nối với chúng tôi
+        div.social-links
+          a(href='#')
+            i.fab.fa-facebook.fa-lg
+          a(href='#')
+            i.fab.fa-twitter.fa-lg
+          a(href='#')
+            i.fab.fa-instagram.fa-lg
+    hr.my-4
+    p.mb-0 &copy; 2025 Hotel Booking System. All rights reserved.

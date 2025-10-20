@@ -1,0 +1,57 @@
+extends ../layoutAdmin
+
+block content
+    .container-fluid.p-4
+        if cookies.adminMessage
+            .alert.alert-success.alert-dismissible.fade.show(role='alert')
+                = cookies.adminMessage
+                button.btn-close(type='button' data-bs-dismiss='alert' aria-label='Close')
+
+        if cookies.adminError
+            .alert.alert-danger.alert-dismissible.fade.show(role='alert')
+                = cookies.adminError
+                button.btn-close(type='button' data-bs-dismiss='alert' aria-label='Close')
+
+        .card.shadow-sm
+            .card-header.bg-white.py-3
+                h5.card-title.mb-0
+                    i.fas.fa-hotel.me-2.text-primary
+                    | Thêm khách sạn mới
+
+            .card-body
+                form#addHotelForm.admin-form(action="/admin/hotels/add" method="POST" enctype="multipart/form-data" onsubmit="return validateAddHotelForm(event)")
+                    .row
+                        .col-md-6.mb-3
+                            label.form-label(for="tenKhachSan") Tên khách sạn
+                            input.form-control#tenKhachSan(type="text" name="tenKhachSan")
+                        
+                        .col-md-6.mb-3
+                            label.form-label(for="phuong") Phường
+                            input.form-control#phuong(type="text" name="phuong")
+                        
+                        .col-md-6.mb-3
+                            label.form-label(for="quan") Quận
+                            input.form-control#quan(type="text" name="quan")
+                        
+                        .col-md-6.mb-3
+                            label.form-label(for="thanhPho") Thành phố
+                            input.form-control#thanhPho(type="text" name="thanhPho")
+                        
+                        .col-md-6.mb-3
+                            label.form-label(for="idDiaDiem") Địa điểm
+                            select.form-select#idDiaDiem(name="idDiaDiem")
+                                each diadiem in diadiems
+                                    option(value=diadiem.idDiaDiem)= diadiem.tenDiaDiem
+                        
+                        .col-md-6.mb-3
+                            label.form-label(for="hinhAnh") Hình ảnh
+                            input.form-control#hinhAnh(type="file" name="hinhAnh" accept="image/*")
+                            small.form-text.text-muted Chọn file ảnh (JPG, PNG)
+                    
+                    .mt-3
+                        button.btn.btn-primary(type="submit")
+                            i.fas.fa-save.me-1
+                            | Thêm khách sạn
+                        a.btn.btn-secondary.ms-2(href="/admin/hotels")
+                            i.fas.fa-times.me-1
+                            | Hủy

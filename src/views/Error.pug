@@ -1,0 +1,13 @@
+extends layouts/layout
+
+block content
+  .container.mt-5
+    .row.justify-content-center
+      .col-md-6.text-center
+        h1.text-danger
+          i.fas.fa-exclamation-triangle.me-2
+          | Lỗi
+        p.lead= message || 'Đã xảy ra lỗi!'
+        a.btn.btn-primary.mt-3(href='/')
+          i.fas.fa-home.me-2
+          | Về trang chủ

@@ -1,0 +1,83 @@
+extends ../layoutAdmin
+
+block content
+    .container-fluid.p-4
+        if cookies && cookies.adminMessage
+            .alert.alert-success.alert-dismissible.fade.show
+                = cookies.adminMessage
+                button.btn-close(type='button' data-bs-dismiss='alert')
+        if cookies && cookies.adminError
+            .alert.alert-danger.alert-dismissible.fade.show
+                = cookies.adminError
+                button.btn-close(type='button' data-bs-dismiss='alert')
+
+        .card.shadow-sm
+            .card-header.bg-white.py-3.d-flex.justify-content-between.align-items-center
+                h5.card-title.mb-0
+                    i.fas.fa-users.me-2.text-primary
+                    | Danh sách người dùng
+                a.btn.btn-primary.btn-sm(href="/admin/users/add")
+                    i.fas.fa-plus.me-1
+                    | Thêm người dùng
+
+            .card-body
+                .table-responsive
+                    table.table.table-hover.align-middle.mb-0
+                        thead.table-light
+                            tr
+                                th.border-0 ID
+                                th.border-0 Họ tên
+                                th.border-0 Email
+                                th.border-0 Số điện thoại
+                                th.border-0 Quyền hạn
+                                th.border-0 Trạng thái
+                                th.border-0.text-end Thao tác
+                        tbody
+                            each user in users
+                                tr
+                                    td= user.idKhachHang
+                                    td
+                                        .d-flex.align-items-center
+                                            .avatar.bg-light.rounded-circle.p-2.me-2
+                                                i.fas.fa-user.text-primary
+                                            = user.hoTen
+                                    td= user.email
+                                    td= user.soDienThoai
+                                    td
+                                        span.badge(class=user.quyenHan === 'admin' ? 'bg-danger' : 'bg-info')= user.quyenHan
+                                    td
+                                        span.badge(class=user.trangThai ? 'bg-success' : 'bg-secondary')
+                                            = user.trangThai ? 'Hoạt động' : 'Khóa'
+                                    td.text-end
+                                        .btn-group
+                                            a.btn.btn-sm.btn-outline-primary.me-2(href=`/admin/users/edit/${user.idKhachHang}`)
+                                                i.fas.fa-edit.me-1
+                                                | Sửa
+                                            if user.quyenHan !== 'admin'
+                                                button.btn.btn-sm.btn-outline-danger(onclick=`deleteUser(${user.idKhachHang})`)
+                                                    i.fas.fa-trash.me-1
+                                                    | Xóa
+
+block scripts
+    script.
+        async function deleteUser(userId) {
+            if (confirm('Bạn có chắc muốn xóa người dùng này?')) {
+                try {
+                    const response = await fetch(`/admin/users/${userId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (response.ok) {
+                        window.location.reload();
+                    } else {
+                        alert('Có lỗi xảy ra khi xóa');
+                    }
+                } catch (error) {
+                    alert('Có lỗi xảy ra khi xóa');
+                }
+            }
+        }
+            

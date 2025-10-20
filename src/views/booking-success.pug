@@ -1,0 +1,395 @@
+extends layouts/layout
+
+block styles
+  style.
+    .success-container {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 0;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+
+    .invoice-header {
+      background: linear-gradient(135deg, #00b4db, #0083b0);
+      padding: 2rem;
+      color: white;
+      text-align: center;
+    }
+
+    .invoice-title {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .invoice-subtitle {
+      font-size: 1.2rem;
+      opacity: 0.9;
+    }
+
+    .invoice-body {
+      padding: 2rem;
+    }
+
+    .booking-details {
+      margin-bottom: 2rem;
+    }
+
+    .detail-row {
+      display: flex;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #eee;
+    }
+
+    .detail-label {
+      flex: 1;
+      font-weight: 600;
+      color: #555;
+    }
+
+    .detail-value {
+      flex: 2;
+      color: #333;
+    }
+
+    .qr-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 1.5rem 0;
+      padding: 1.5rem;
+      background: #f9f9f9;
+      border-radius: 10px;
+    }
+
+    .qr-info {
+      margin-top: 1rem;
+      text-align: center;
+      color: #666;
+    }
+
+    .price-summary {
+      background: #f9f9f9;
+      padding: 1.5rem;
+      border-radius: 10px;
+      margin-top: 2rem;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+    }
+
+    .total-price {
+      display: flex;
+      justify-content: space-between;
+      padding-top: 1rem;
+      margin-top: 1rem;
+      border-top: 2px dashed #ddd;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #0083b0;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .btn-action {
+      flex: 1;
+      padding: 1rem;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-email {
+      background: #00b4db;
+      color: white;
+    }
+
+    .btn-email:hover {
+      background: #0083b0;
+      transform: translateY(-2px);
+    }
+
+    .btn-print {
+      background: #6c757d;
+      color: white;
+    }
+
+    .btn-print:hover {
+      background: #5a6268;
+      transform: translateY(-2px);
+    }
+
+    .btn-home {
+      background: #28a745;
+      color: white;
+    }
+
+    .btn-home:hover {
+      background: #218838;
+      transform: translateY(-2px);
+    }
+
+    .hotel-info {
+      background: rgba(0,179,219,0.1);
+      padding: 1.5rem;
+      border-radius: 10px;
+      margin-bottom: 2rem;
+    }
+
+    .notification-container {
+      animation: slideIn 0.5s ease-out;
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      display: none;
+    }
+
+    .alert {
+      padding: 1rem 1.5rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      margin-bottom: 1rem;
+    }
+
+    .alert-success {
+      background: linear-gradient(45deg, #48bb78, #38a169);
+      color: white;
+      border: none;
+    }
+
+    .alert-danger {
+      background: linear-gradient(45deg, #f56565, #e53e3e);
+      color: white;
+      border: none;
+    }
+
+    .alert-info {
+      background: linear-gradient(45deg, #4299e1, #3182ce);
+      color: white;
+      border: none;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    .loading-icon {
+      display: inline-block;
+      animation: rotate 1s linear infinite;
+      margin-right: 5px;
+    }
+
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .btn-action:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+block content
+  // Thêm div để hiển thị thông báo
+  .notification-container#notificationContainer
+    .alert#alertNotification(role="alert")
+      i#notificationIcon.fas.fa-check-circle.me-2
+      span#notificationMessage
+  
+  .success-container
+    .invoice-header
+      h1.invoice-title
+        i.fas.fa-check-circle.me-2
+        | Đặt Phòng Thành Công
+      p.invoice-subtitle Cảm ơn bạn đã đặt phòng tại khách sạn của chúng tôi
+    
+    .invoice-body
+      if booking
+        .booking-details
+          .hotel-info
+            h3.mb-3
+              i.fas.fa-hotel.me-2
+              = booking.tenKhachSan
+            p.mb-2
+              i.fas.fa-map-marker-alt.me-2
+              | Địa chỉ: #{booking.diaChi}
+          
+          h4.mb-3 Chi tiết đặt phòng
+          
+          .detail-row
+            .detail-label Mã đặt phòng
+            .detail-value
+              span.badge.bg-primary ##{booking.idDatPhong}
+          
+          .detail-row
+            .detail-label Khách hàng
+            .detail-value #{booking.hoTen}
+          
+          .detail-row
+            .detail-label Email
+            .detail-value #{booking.email}
+          
+          .detail-row
+            .detail-label Số điện thoại
+            .detail-value #{booking.soDienThoai || 'Chưa cung cấp'}
+          
+          .detail-row
+            .detail-label Phòng
+            .detail-value #{booking.idPhong} - #{booking.loaiPhong}
+          
+          .detail-row
+            .detail-label Ngày nhận phòng
+            .detail-value #{new Date(booking.ngayBatDau).toLocaleDateString('vi-VN')}
+          
+          .detail-row
+            .detail-label Ngày trả phòng
+            .detail-value #{new Date(booking.ngayKetThuc).toLocaleDateString('vi-VN')}
+          
+          .detail-row
+            .detail-label Số đêm
+            .detail-value #{nights} đêm
+        
+        .qr-container
+          img#qrCode(src=qrCodeURL, alt="Mã QR xác nhận đặt phòng")
+          p.qr-info Quét mã QR này để xác nhận khi bạn đến nhận phòng
+        
+        .price-summary
+          .summary-row
+            span Giá phòng mỗi đêm
+            span #{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(booking.donGia)}
+          
+          .summary-row
+            span Số đêm
+            span #{booking.soLuongDem || nights} đêm
+          
+          .total-price
+            span Tổng tiền
+            span #{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(booking.thanhTien || (booking.donGia * (booking.soLuongDem || nights)))}
+        
+        .action-buttons
+          button#sendEmailBtn.btn-action.btn-email(type="button", data-booking-id=booking.idDatPhong)
+            i.fas.fa-envelope.me-2
+            span#emailBtnText Gửi vào email
+          
+          button#printBtn.btn-action.btn-print(type="button")
+            i.fas.fa-print.me-2
+            | In hóa đơn
+          
+          a.btn-action.btn-home(href="/")
+            i.fas.fa-home.me-2
+            | Về trang chủ
+      else
+        .alert.alert-warning
+          i.fas.fa-exclamation-triangle.me-2
+          | Không tìm thấy thông tin đặt phòng
+
+block scripts
+  script.
+    document.addEventListener('DOMContentLoaded', function() {
+      // Xử lý in hóa đơn
+      document.getElementById('printBtn').addEventListener('click', function() {
+        window.print();
+      });
+      
+      // Xử lý gửi email
+      document.getElementById('sendEmailBtn').addEventListener('click', async function() {
+        const bookingId = this.getAttribute('data-booking-id');
+        const emailBtn = this;
+        const emailBtnText = document.getElementById('emailBtnText');
+        
+        // Disable button và hiển thị đang gửi
+        emailBtn.disabled = true;
+        emailBtnText.innerHTML = '<i class="fas fa-spinner loading-icon"></i> Đang gửi...';
+        
+        // Hiển thị thông báo đang gửi
+        showNotification('Đang gửi email, vui lòng đợi...', 'info');
+        
+        try {
+          const response = await fetch(`/bookings/${bookingId}/send-email`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
+          
+          const result = await response.json();
+          
+          if (response.ok) {
+            showNotification('Email đã được gửi thành công!', 'success');
+            // Cập nhật nút sau khi gửi thành công
+            emailBtnText.innerHTML = '<i class="fas fa-check me-2"></i> Đã gửi';
+          } else {
+            showNotification('Có lỗi xảy ra khi gửi email: ' + result.message, 'danger');
+            // Reset nút
+            emailBtnText.innerHTML = '<i class="fas fa-envelope me-2"></i> Gửi lại';
+            emailBtn.disabled = false;
+          }
+        } catch (error) {
+          showNotification('Có lỗi xảy ra khi gửi email: ' + error.message, 'danger');
+          console.error('Error:', error);
+          // Reset nút
+          emailBtnText.innerHTML = '<i class="fas fa-envelope me-2"></i> Gửi lại';
+          emailBtn.disabled = false;
+        }
+      });
+      
+      function showNotification(message, type = 'success') {
+        const container = document.getElementById('notificationContainer');
+        const messageEl = document.getElementById('notificationMessage');
+        const alertEl = document.getElementById('alertNotification');
+        const iconEl = document.getElementById('notificationIcon');
+        
+        // Cập nhật nội dung và loại thông báo
+        messageEl.textContent = message;
+        
+        // Xóa tất cả các class alert
+        alertEl.classList.remove('alert-success', 'alert-danger', 'alert-info');
+        
+        // Thêm class phù hợp
+        alertEl.classList.add(`alert-${type}`);
+        
+        // Cập nhật icon
+        iconEl.classList.remove('fa-check-circle', 'fa-exclamation-circle', 'fa-info-circle');
+        
+        switch(type) {
+          case 'success':
+            iconEl.classList.add('fa-check-circle');
+            break;
+          case 'danger':
+            iconEl.classList.add('fa-exclamation-circle');
+            break;
+          case 'info':
+            iconEl.classList.add('fa-info-circle');
+            break;
+        }
+        
+        // Hiển thị thông báo
+        container.style.display = 'block';
+        
+        // Tự động ẩn sau 5 giây
+        setTimeout(() => {
+          container.style.display = 'none';
+        }, 5000);
+      }
+    }); 

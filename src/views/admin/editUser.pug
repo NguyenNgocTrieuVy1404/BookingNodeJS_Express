@@ -1,0 +1,59 @@
+extends ../layoutAdmin
+
+block content
+    .container-fluid.p-4
+        if cookies.adminMessage
+            .alert.alert-success.alert-dismissible.fade.show(role='alert')
+                = cookies.adminMessage
+                button.btn-close(type='button' data-bs-dismiss='alert' aria-label='Close')
+
+        if cookies.adminError
+            .alert.alert-danger.alert-dismissible.fade.show(role='alert')
+                = cookies.adminError
+                button.btn-close(type='button' data-bs-dismiss='alert' aria-label='Close')
+
+        .card.shadow-sm
+            .card-header.bg-white.py-3
+                h5.card-title.mb-0
+                    i.fas.fa-user-edit.me-2.text-primary
+                    | Chỉnh sửa thông tin người dùng
+
+            .card-body
+                form#editUserForm.admin-form(action=`/admin/users/${user.idKhachHang}` method="POST" onsubmit="return validateEditUserForm(event)")
+                    input(type="hidden" name="_method" value="PUT")
+                    .row
+                        .col-md-6.mb-3
+                            label.form-label(for="hoTen") Họ tên
+                            input.form-control#hoTen(type="text" name="hoTen" value=user.hoTen)
+                        
+                        .col-md-6.mb-3
+                            label.form-label(for="email") Email
+                            input.form-control#email(type="email" name="email" value=user.email)
+                        
+                        .col-md-6.mb-3
+                            label.form-label(for="soDienThoai") Số điện thoại
+                            input.form-control#soDienThoai(type="tel" name="soDienThoai" value=user.soDienThoai)
+                        
+                        .col-md-6.mb-3
+                            label.form-label(for="diaChi") Địa chỉ
+                            input.form-control#diaChi(type="text" name="diaChi" value=user.diaChi || '')
+                        
+                        .col-md-6.mb-3
+                            label.form-label(for="quyenHan") Quyền hạn
+                            select.form-select#quyenHan(name="quyenHan")
+                                option(value="user" selected=user.quyenHan === 'user') User
+                                option(value="admin" selected=user.quyenHan === 'admin') Admin
+                        
+                        .col-md-6.mb-3
+                            label.form-label(for="trangThai") Trạng thái tài khoản
+                            select.form-select#trangThai(name="trangThai")
+                                option(value="true" selected=user.trangThai) Hoạt động
+                                option(value="false" selected=!user.trangThai) Khóa
+                    
+                    .mt-3
+                        button.btn.btn-primary(type="submit")
+                            i.fas.fa-save.me-1
+                            | Lưu thay đổi
+                        a.btn.btn-secondary.ms-2(href="/admin/users")
+                            i.fas.fa-times.me-1
+                            | Hủy

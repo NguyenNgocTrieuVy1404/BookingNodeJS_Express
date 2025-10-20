@@ -1,0 +1,56 @@
+extends ../layoutManager
+
+block content
+    .container-fluid.p-4
+        .d-flex.justify-content-between.align-items-center.mb-4
+            h2.mb-0 Danh sách khách sạn
+            .d-flex.align-items-center
+                span.badge.bg-primary.me-2 Khu vực: #{manager.tenDiaDiem}
+
+        .card.shadow-sm
+            .card-header.bg-white.py-3.d-flex.justify-content-between.align-items-center
+                h5.card-title.mb-0
+                    i.fas.fa-hotel.me-2.text-primary
+                    | Khách sạn trong khu vực quản lý
+
+            .card-body
+                .table-responsive
+                    table.table.table-hover.align-middle.mb-0
+                        thead.table-light
+                            tr
+                                th ID
+                                th Tên khách sạn
+                                th Địa chỉ
+                                th Số sao
+                                th.text-center Thao tác
+                        tbody
+                            if hotels && hotels.length
+                                each hotel in hotels
+                                    tr
+                                        td= hotel.idKhachSan
+                                        td
+                                            .d-flex.align-items-center
+                                                if hotel.hinhAnh
+                                                    img.hotel-thumb.me-2(src=`/uploads/hotels/${hotel.hinhAnh}` alt=hotel.tenKhachSan style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;")
+                                                else
+                                                    .hotel-icon.me-2.text-primary
+                                                        i.fas.fa-hotel
+                                                span.fw-medium= hotel.tenKhachSan
+                                        td
+                                            | #{hotel.phuong}, #{hotel.quan}, #{hotel.thanhPho}
+                                        td
+                                            .rating
+                                                - for (let i = 0; i < hotel.soSao; i++)
+                                                    i.fas.fa-star.text-warning
+                                                - for (let i = hotel.soSao; i < 5; i++)
+                                                    i.far.fa-star.text-muted
+                                        td.text-center
+                                            a.btn.btn-sm.btn-outline-primary.me-2(href=`/manager/hotels/${hotel.idKhachSan}` title="Chi tiết")
+                                                i.fas.fa-info-circle
+                                                span.ms-1 Chi tiết
+                            else
+                                tr
+                                    td(colspan="5").text-center.py-4
+                                        .empty-state
+                                            i.fas.fa-hotel.fa-3x.mb-3.text-muted
+                                            p.mb-0 Không có khách sạn nào trong khu vực quản lý 

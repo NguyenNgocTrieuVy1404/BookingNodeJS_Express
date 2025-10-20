@@ -1,0 +1,560 @@
+extends layouts/layout
+
+block content
+  style.
+    .page-header {
+      background: linear-gradient(135deg, #1a365d, #2c5282);
+      padding: 3rem 0;
+      margin-bottom: 3rem;
+      color: white;
+      text-align: center;
+    }
+
+    .page-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .bookings-container {
+      max-width: 1200px;
+      margin: -2rem auto 2rem;
+      padding: 0 2rem;
+      position: relative;
+    }
+
+    .bookings-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+      gap: 2rem;
+    }
+
+    .booking-card {
+      background: white;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .booking-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+    }
+
+    .booking-header {
+      background: #f8fafc;
+      padding: 1.5rem;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .hotel-name {
+      font-size: 1.4rem;
+      color: #1a365d;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .hotel-name i {
+      color: #3182ce;
+    }
+
+    .booking-body {
+      padding: 1.5rem;
+    }
+
+    .booking-info {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .info-item {
+      display: flex;
+      gap: 1rem;
+      padding: 0.8rem;
+      background: #f8fafc;
+      border-radius: 12px;
+      transition: background 0.3s ease;
+    }
+
+    .info-item:hover {
+      background: #edf2f7;
+    }
+
+    .info-icon {
+      width: 40px;
+      height: 40px;
+      background: white;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #3182ce;
+      font-size: 1.2rem;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .info-content {
+      flex: 1;
+    }
+
+    .info-label {
+      color: #64748b;
+      font-size: 0.85rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .info-value {
+      color: #1a365d;
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    .booking-status {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.6rem 1.2rem;
+      border-radius: 30px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      gap: 0.5rem;
+    }
+
+    .status-confirmed {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .status-cancelled {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+    
+    .status-completed {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+    
+    .status-noshow {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .booking-actions {
+      padding-top: 1.5rem;
+      margin-top: 1.5rem;
+      border-top: 1px solid #e2e8f0;
+      text-align: right;
+    }
+
+    .btn-cancel {
+      background: #fee2e2;
+      color: #991b1b;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.8rem;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .btn-cancel:hover {
+      background: #fecaca;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(153, 27, 27, 0.2);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .empty-state i {
+      font-size: 4rem;
+      color: #94a3b8;
+      margin-bottom: 1.5rem;
+    }
+
+    .empty-state p {
+      color: #64748b;
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: white;
+      padding: 1rem 2rem;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 1rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.8rem;
+      transition: all 0.3s ease;
+      text-decoration: none;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+    }
+    
+    .price-summary {
+      background: #f8fafc;
+      padding: 1.5rem;
+      border-radius: 12px;
+      margin-top: 1.5rem;
+    }
+    
+    .price-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.8rem;
+      color: #64748b;
+    }
+    
+    .total-price {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px dashed #cbd5e1;
+      font-weight: 700;
+      color: #1a365d;
+      font-size: 1.1rem;
+    }
+    
+    .booking-id {
+      font-size: 0.9rem;
+      font-weight: normal;
+      color: #64748b;
+      margin-top: 0.5rem;
+    }
+
+    .btn-view-invoice {
+      background: #edf2f7;
+      color: #1a365d;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.8rem;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      text-decoration: none;
+      margin-right: 0.8rem;
+    }
+
+    .btn-view-invoice:hover {
+      background: #e2e8f0;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(26, 54, 93, 0.15);
+    }
+    
+    .cancel-countdown {
+      margin-top: 1rem;
+      background: #fffbeb;
+      border-radius: 12px;
+      padding: 0.8rem 1.2rem;
+      font-size: 0.9rem;
+      border-left: 4px solid #f59e0b;
+      color: #92400e;
+    }
+    
+    .countdown-danger {
+      background: #fee2e2;
+      border-left-color: #ef4444;
+      color: #b91c1c;
+    }
+    
+    .countdown-expired {
+      background: #f3f4f6;
+      border-left-color: #9ca3af;
+      color: #4b5563;
+    }
+    
+    .countdown-special {
+      background: #e0f2fe;
+      border-left-color: #3b82f6;
+      color: #1e40af;
+    }
+    
+    .disable-cancel {
+      background: #e5e7eb !important;
+      color: #9ca3af !important;
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: none !important;
+    }
+
+  .page-header
+    h1.page-title
+      i.fas.fa-bookmark.me-3
+      | Đặt phòng của tôi
+
+  .bookings-container
+    if bookings && bookings.length
+      .bookings-grid
+        each booking in bookings
+          .booking-card(data-created-at=booking.ngayTao)
+            .booking-header
+              .hotel-name
+                i.fas.fa-hotel
+                = booking.tenKhachSan
+                span.booking-id Mã đặt phòng: ##{booking.idDatPhong}
+            .booking-body
+              .booking-info
+                .info-item
+                  .info-icon
+                    i.fas.fa-door-closed
+                  .info-content
+                    .info-label Phòng
+                    .info-value= booking.idPhong || booking.idPhong || 'Chưa có số phòng'
+                .info-item
+                  .info-icon
+                    i.fas.fa-bed
+                  .info-content
+                    .info-label Loại phòng
+                    .info-value= booking.loaiPhong
+                .info-item
+                  .info-icon
+                    i.fas.fa-calendar-check
+                  .info-content
+                    .info-label Ngày đến
+                    .info-value= new Date(booking.ngayBatDau).toLocaleDateString('vi-VN')
+                .info-item
+                  .info-icon
+                    i.fas.fa-calendar-times
+                  .info-content
+                    .info-label Ngày đi
+                    .info-value= new Date(booking.ngayKetThuc).toLocaleDateString('vi-VN')
+                .info-item
+                  .info-icon
+                    i.fas.fa-moon
+                  .info-content
+                    .info-label Số đêm
+                    .info-value= booking.soLuongDem || (Math.ceil((new Date(booking.ngayKetThuc) - new Date(booking.ngayBatDau)) / (1000 * 60 * 60 * 24)))
+                .info-item
+                  .info-icon
+                    i.fas.fa-info-circle
+                  .info-content
+                    .info-label Trạng thái
+                    - var statusClass = 'status-confirmed'
+                    - var statusText = 'Đã xác nhận'
+                    - var statusIcon = 'fas fa-check-circle'
+                    case booking.trangThai
+                      when 0
+                        - statusClass = 'status-cancelled'
+                        - statusText = 'Đã hủy'
+                        - statusIcon = 'fas fa-times-circle'
+                      when 2
+                        - statusClass = 'status-completed'
+                        - statusText = 'Đã hoàn thành'
+                        - statusIcon = 'fas fa-check-double'
+                      when 3
+                        - statusClass = 'status-noshow'
+                        - statusText = 'Không checkin'
+                        - statusIcon = 'fas fa-user-slash'
+                    .booking-status(class=statusClass)
+                      i(class=statusIcon)
+                      = statusText
+              
+              .price-summary
+                .price-row
+                  span Đơn giá:
+                  span= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(booking.donGia || 0)
+                .price-row
+                  span Số đêm:
+                  span= booking.soLuongDem || (Math.ceil((new Date(booking.ngayKetThuc) - new Date(booking.ngayBatDau)) / (1000 * 60 * 60 * 24)))
+                .total-price
+                  span Tổng tiền:
+                  span= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(booking.thanhTien || booking.donGia * (booking.soLuongDem || Math.ceil((new Date(booking.ngayKetThuc) - new Date(booking.ngayBatDau)) / (1000 * 60 * 60 * 24))))
+              
+              .booking-actions
+                a.btn-view-invoice(href=`/bookings/success/${booking.idDatPhong}`)
+                  i.fas.fa-file-invoice
+                  | Xem chi tiết hóa đơn
+                if booking.trangThai === 1
+                  button.btn-cancel(onclick=`cancelBooking(${booking.idDatPhong})`, id=`cancel-${booking.idDatPhong}`)
+                    i.fas.fa-times-circle
+                    | Hủy đặt phòng
+                  .cancel-countdown(id=`countdown-${booking.idDatPhong}`)
+                    i.fas.fa-clock.me-2
+                    span(id=`countdown-text-${booking.idDatPhong}`) Đang tính thời gian còn lại...
+    else
+      .empty-state
+        i.fas.fa-calendar-times
+        p Bạn chưa có đặt phòng nào
+        a.btn-primary(href='/')
+          i.fas.fa-search
+          | Tìm phòng ngay
+
+  script.
+    async function cancelBooking(bookingId) {
+      const cancelBtn = document.getElementById(`cancel-${bookingId}`);
+      if (cancelBtn.classList.contains('disable-cancel')) {
+        alert('Đã quá thời gian cho phép hủy đặt phòng (24 giờ trước khi nhận phòng)');
+        return;
+      }
+      
+      if (!confirm('Bạn có chắc chắn muốn hủy đặt phòng này?')) {
+        return;
+      }
+      
+      try {
+        const response = await fetch(`/bookings/${bookingId}/cancel`, {
+          method: 'POST'
+        });
+        const data = await response.json();
+        
+        if (response.ok) {
+          alert('Hủy đặt phòng thành công');
+          window.location.reload();
+        } else {
+          alert(data.message);
+        }
+      } catch (error) {
+        alert('Có lỗi xảy ra khi hủy đặt phòng');
+      }
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      // Khởi tạo đếm ngược cho mỗi đặt phòng
+      const bookings = document.querySelectorAll('.booking-card');
+      
+      bookings.forEach(booking => {
+        const idElement = booking.querySelector('.booking-id');
+        if (!idElement) return;
+        
+        const idText = idElement.textContent;
+        const bookingId = idText.match(/#(\d+)/)[1];
+        
+        const startDateElement = booking.querySelector('.info-item:nth-child(3) .info-value');
+        if (!startDateElement) return;
+        
+        const startDateText = startDateElement.textContent;
+        const startDate = parseVietnameseDate(startDateText);
+        
+        // Lấy thời gian tạo đặt phòng (ẩn trong data attribute)
+        // Chúng ta cần thêm data attribute này từ server-side khi render
+        const bookingCreatedAtStr = booking.getAttribute('data-created-at');
+        let bookingCreatedAt = null;
+        
+        if (bookingCreatedAtStr) {
+          bookingCreatedAt = new Date(bookingCreatedAtStr);
+        }
+        
+        // Cập nhật đếm ngược
+        updateCancelCountdown(bookingId, startDate, bookingCreatedAt);
+        
+        // Cập nhật mỗi phút
+        setInterval(() => {
+          updateCancelCountdown(bookingId, startDate, bookingCreatedAt);
+        }, 60000);
+      });
+      
+      // Hàm chuyển đổi ngày Việt Nam sang đối tượng Date
+      function parseVietnameseDate(dateString) {
+        const parts = dateString.split('/');
+        // Chú ý: Tháng trong Date bắt đầu từ 0
+        return new Date(parts[2], parts[1] - 1, parts[0]);
+      }
+      
+      // Hàm cập nhật đếm ngược
+      function updateCancelCountdown(bookingId, startDate, bookingCreatedAt) {
+        const countdownElement = document.getElementById(`countdown-${bookingId}`);
+        const countdownTextElement = document.getElementById(`countdown-text-${bookingId}`);
+        const cancelButton = document.getElementById(`cancel-${bookingId}`);
+        
+        if (!countdownElement || !countdownTextElement || !cancelButton) return;
+        
+        const now = new Date();
+        let canCancel = false;
+        let countdownText = '';
+        let timeRemaining = 0;
+        let isWithin24HoursOfBooking = false;
+        
+        // Trường hợp 1: Nếu có ngày tạo và chưa quá 24 giờ kể từ lúc đặt
+        if (bookingCreatedAt) {
+          const bookingTime = new Date(bookingCreatedAt);
+          const bookingTimeLimit = new Date(bookingCreatedAt);
+          bookingTimeLimit.setTime(bookingTimeLimit.getTime() + (24 * 60 * 60 * 1000)); // Thêm 24 giờ
+          
+          if (now < bookingTimeLimit) {
+            // Còn trong thời gian 24 giờ kể từ lúc đặt
+            timeRemaining = bookingTimeLimit - now;
+            canCancel = true;
+            isWithin24HoursOfBooking = true;
+          }
+        }
+        
+        // Trường hợp 2: Nếu không còn trong 24h từ lúc đặt, kiểm tra quy tắc 24h trước check-in
+        if (!isWithin24HoursOfBooking) {
+          const cancelDeadline = new Date(startDate);
+          cancelDeadline.setDate(cancelDeadline.getDate() - 1); // 24 giờ trước check-in
+          
+          if (now < cancelDeadline) {
+            timeRemaining = cancelDeadline - now;
+            canCancel = true;
+          }
+        }
+        
+        if (!canCancel) {
+          // Đã hết thời gian hủy
+          if (isWithin24HoursOfBooking) {
+            countdownText = 'Đã hết thời gian hủy đặt phòng (đã quá 24 giờ kể từ khi đặt)';
+          } else {
+            countdownText = 'Đã hết thời gian hủy đặt phòng (yêu cầu hủy trước 24 giờ so với thời điểm check-in)';
+          }
+          
+          countdownElement.classList.add('countdown-expired');
+          cancelButton.classList.add('disable-cancel');
+          cancelButton.disabled = true;
+        } else {
+          // Tính ngày, giờ, phút còn lại
+          const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+          const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+          
+          // Tạo text hiển thị
+          if (isWithin24HoursOfBooking) {
+            // Đang trong 24 giờ đầu sau khi đặt
+            if (hours > 0) {
+              countdownText = `Còn ${hours} giờ ${minutes} phút để hủy miễn phí (trong vòng 24 giờ sau khi đặt)`;
+            } else {
+              countdownText = `Còn ${minutes} phút để hủy miễn phí (trong vòng 24 giờ sau khi đặt)`;
+            }
+            countdownElement.classList.add('countdown-special');
+          } else {
+            // Theo quy tắc 24h trước check-in
+            if (days > 0) {
+              countdownText = `Còn ${days} ngày ${hours} giờ để hủy phòng (hủy trước 24 giờ so với thời điểm check-in)`;
+            } else if (hours > 0) {
+              countdownText = `Còn ${hours} giờ ${minutes} phút để hủy phòng (hủy trước 24 giờ so với thời điểm check-in)`;
+              countdownElement.classList.add('countdown-danger');
+            } else {
+              countdownText = `Còn ${minutes} phút để hủy phòng (hủy trước 24 giờ so với thời điểm check-in)`;
+              countdownElement.classList.add('countdown-danger');
+            }
+          }
+        }
+        
+        countdownTextElement.textContent = countdownText;
+      }
+    });

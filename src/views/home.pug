@@ -1,0 +1,322 @@
+extends layouts/layout
+
+block styles
+  style.
+    .hero-section {
+      background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+                  url('/img/hero-bg.jpg');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      padding: 150px 0;
+      color: white;
+      position: relative;
+      margin-top: -76px;
+    }
+
+    .hero-section h1 {
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    .hero-section .lead {
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+    }
+
+    .search-box {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 12px;
+      padding: 25px;
+      box-shadow: 0 5px 30px rgba(0,0,0,0.2);
+      margin-top: 30px;
+      backdrop-filter: blur(5px);
+    }
+
+    .form-label {
+      color: #000000;
+      font-weight: 500;
+    }
+
+    .search-tabs {
+      margin-bottom: 20px;
+    }
+
+    .search-tab {
+      padding: 10px 20px;
+      color: #666;
+      cursor: pointer;
+      border: none;
+      background: none;
+      font-weight: 600;
+      position: relative;
+    }
+
+    .search-tab.active {
+      color: #ff5722;
+    }
+
+    .search-tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 20px;
+      right: 20px;
+      height: 3px;
+      background: #ff5722;
+      border-radius: 3px;
+    }
+
+    .search-input {
+      border: 2px solid #eee;
+      border-radius: 8px;
+      padding: 12px 15px;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+
+    .search-input:focus {
+      border-color: #ff5722;
+      box-shadow: 0 0 0 3px rgba(255,87,34,0.1);
+    }
+
+    .search-btn {
+      background: #ff5722;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 30px;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .search-btn:hover {
+      background: #f4511e;
+      transform: translateY(-2px);
+    }
+
+    .location-icon {
+      color: #ff5722;
+      font-size: 20px;
+    }
+
+    .hotel-card {
+      border: none;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+      transition: all 0.3s ease;
+      margin-bottom: 2rem;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .hotel-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+
+    .card-img-top {
+      height: 220px;
+      object-fit: cover;
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+    }
+
+    .card-body {
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      line-height: 1.4;
+    }
+
+    .card-text {
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .text-primary {
+      color: #ff5722 !important;
+    }
+
+    .btn-outline-primary {
+      margin-top: auto;
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+    }
+
+    .btn-outline-primary:hover {
+      background-color: #ff5722;
+      border-color: #ff5722;
+      color: white;
+    }
+
+    .search-results {
+      background: white;
+      border-radius: 12px;
+      padding: 25px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+      margin-top: 30px;
+    }
+
+block content
+  section.hero-section
+    .container
+      .row.justify-content-center.text-center
+        .col-md-8
+          h1.display-4.fw-bold.mb-4 Khám phá điểm đến của bạn
+          p.lead.mb-4 Tìm và đặt chỗ ở những địa điểm tuyệt vời nhất
+
+      .row.justify-content-center
+        .col-md-11 
+          .search-box
+            .search-tabs.d-flex.justify-content-start
+              button.search-tab.active
+                i.fas.fa-hotel.me-2
+                | Khách sạn  
+            .search-content
+              .row.g-3
+                .col-md-8
+                  .form-group
+                    label.form-label Địa điểm
+                    .input-group
+                      span.input-group-text.bg-white
+                        i.fas.fa-map-marker-alt.location-icon
+                      input.form-control.search-input(type='text' placeholder='Bạn muốn đi đâu?')
+                
+                .col-md-4
+                  .form-group
+                    label.form-label &nbsp;
+                    button.search-btn.w-100
+                      i.fas.fa-search.me-2
+                      | Tìm kiếm
+
+  section.py-5
+    .container
+      h2.text-center.mb-4.fw-bold Khách sạn nổi bật
+      .row
+        each hotel in hotels || []
+          .col-md-4.mb-4
+            .card.hotel-card
+              if hotel.hinhAnh
+                img.card-img-top(
+                  src=hotel.hinhAnh 
+                  alt=hotel.tenKhachSan
+                )
+              else 
+                img.card-img-top(
+                  src="/images/default-hotel.jpg" 
+                  alt="Default hotel image"
+                )
+              .card-body
+                h5.card-title.fw-bold= hotel.tenKhachSan
+                p.card-text.text-muted
+                  i.fas.fa-map-marker-alt.me-2
+                  | #{hotel.diaChi}, #{hotel.tenDiaDiem}
+                if hotel.giaPhong
+                  p.card-text
+                    span.text-primary.fw-bold Từ #{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(hotel.giaPhong)}
+                    |  / đêm
+                a.btn.btn-outline-primary.mt-auto(href=`/hotels/${hotel.idKhachSan}` role="button")
+                  | Xem chi tiết 
+                  i.fas.fa-arrow-right.ms-2
+        else
+          .col-12
+            .alert.alert-info.text-center
+              i.fas.fa-info-circle.me-2
+              | Không có khách sạn nào
+
+block scripts
+  script.
+    // Xử lý chuyển tab
+    document.querySelectorAll('.search-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelector('.search-tab.active').classList.remove('active');
+        tab.classList.add('active');
+      });
+    });
+
+    function incrementValue(id) {
+      const valueElement = document.getElementById(`${id}-value`);
+      const currentValue = parseInt(valueElement.textContent);
+      const maxValue = id === 'adults' ? 10 : 5;
+      if (currentValue < maxValue) {
+        valueElement.textContent = currentValue + 1;
+        updateGuestsRoomsLabel();
+      }
+    }
+
+    function decrementValue(id) {
+      const valueElement = document.getElementById(`${id}-value`);
+      const currentValue = parseInt(valueElement.textContent);
+      const minValue = 1;
+      if (currentValue > minValue) {
+        valueElement.textContent = currentValue - 1;
+        updateGuestsRoomsLabel();
+      }
+    }
+
+    function updateGuestsRoomsLabel() {
+      const adults = parseInt(document.getElementById('adults-value').textContent);
+      const rooms = parseInt(document.getElementById('rooms-value').textContent);
+      const label = `${adults} người, ${rooms} phòng`;
+      document.getElementById('guestsRoomsLabel').textContent = label;
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      updateGuestsRoomsLabel();
+    });
+
+    // Sửa lại xử lý cho nút tìm kiếm
+    document.querySelector('.search-btn').addEventListener('click', function() {
+      const searchInput = document.querySelector('.input-group .search-input');
+      const searchTerm = searchInput.value.trim().toLowerCase();
+      
+      // Lấy tất cả card khách sạn hiện có
+      const allHotels = Array.from(document.querySelectorAll('.hotel-card')).map(card => {
+        return {
+          element: card,
+          name: card.querySelector('.card-title').textContent.toLowerCase(),
+          address: card.querySelector('.card-text.text-muted').textContent.toLowerCase()
+        };
+      });
+
+      if (searchTerm) {
+        // Tìm kiếm từ danh sách khách sạn
+        const results = allHotels.filter(hotel => 
+          hotel.name.includes(searchTerm) || 
+          hotel.address.includes(searchTerm)
+        );
+
+        // Tạo hoặc cập nhật phần kết quả tìm kiếm
+        let searchResults = document.querySelector('.search-results');
+        if (!searchResults) {
+          searchResults = document.createElement('div');
+          searchResults.className = 'search-results mt-4';
+          document.querySelector('.search-box').parentNode.appendChild(searchResults);
+        }
+
+        // Hiển thị kết quả
+        if (results.length > 0) {
+          searchResults.innerHTML = `
+            <h3 class="text-center mb-4">Kết quả tìm kiếm</h3>
+            <div class="row">
+              ${results.map(result => {
+                const hotelCard = result.element.cloneNode(true);
+                return `<div class="col-md-4 mb-4">${hotelCard.outerHTML}</div>`;
+              }).join('')}
+            </div>
+          `;
+        } else {
+          searchResults.innerHTML = `
+            <div class="alert alert-info text-center">
+              <i class="fas fa-info-circle me-2"></i>
+              Không tìm thấy khách sạn nào phù hợp với "${searchTerm}"
+            </div>
+          `;
+        }
+      }
+    });

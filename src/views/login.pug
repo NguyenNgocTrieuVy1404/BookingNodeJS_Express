@@ -1,0 +1,139 @@
+extends layouts/layout
+
+block styles
+  style.
+    .auth-container {
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      padding: 40px 0;
+      min-height: calc(100vh - 200px);
+    }
+    .card {
+      border: none;
+      border-radius: 15px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      background: rgba(255, 255, 255, 0.95);
+      transition: transform 0.3s ease;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+    }
+    .card-title {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #2b3d51;
+      margin-bottom: 30px;
+    }
+    .form-control {
+      border-radius: 10px;
+      padding: 12px;
+      border: 2px solid #e1e5ea;
+      transition: all 0.3s ease;
+    }
+    .form-control:focus {
+      box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+      border-color: #007bff;
+    }
+    .btn-primary {
+      padding: 12px;
+      border-radius: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      background: linear-gradient(45deg, #007bff, #0056b3);
+      border: none;
+      transition: all 0.3s ease;
+    }
+    .btn-primary:hover {
+      background: linear-gradient(45deg, #0056b3, #003d80);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 86, 179, 0.4);
+    }
+    .auth-link {
+      color: #007bff;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+    .auth-link:hover {
+      color: #0056b3;
+      text-decoration: underline;
+    }
+    .input-group {
+      position: relative;
+    }
+    .input-icon {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #6c757d;
+      cursor: pointer;
+    }
+    .error-message {
+      font-size: 0.85rem;
+      color: #dc3545;
+    }
+    .is-invalid {
+      border-color: #dc3545 !important;
+    }
+
+block content
+  .auth-container
+    .row.justify-content-center
+      .col-md-5
+        .card
+          .card-body.p-5
+            h3.card-title.text-center Đăng nhập
+            if error
+              .alert.alert-danger.mb-4
+                i.fas.fa-exclamation-circle.me-2
+                = error
+            form#loginForm(action='/users/login' method='POST' onsubmit="return validateLoginForm(event)")
+              .mb-4
+                label.form-label(for='username') Tên đăng nhập
+                .input-group
+                  input.form-control(
+                    type='text' 
+                    name='tenDangNhap' 
+                    id='username' 
+                    value=oldInput ? oldInput.tenDangNhap : ''
+                    placeholder='Nhập tên đăng nhập'
+                  )
+                  i.fas.fa-user.input-icon
+              .mb-4
+                label.form-label(for='password') Mật khẩu
+                .input-group
+                  input.form-control(
+                    type='password' 
+                    name='matKhau'
+                    id='loginPassword' 
+                    placeholder='Nhập mật khẩu'
+                  )
+                  i.fas.fa-eye.input-icon#toggleLoginPasswordIcon
+              button.btn.btn-primary.w-100.mb-4(type='submit') 
+                i.fas.fa-sign-in-alt.me-2
+                | Đăng nhập
+              
+              .d-flex.justify-content-center.align-items-center.mb-4
+                hr.flex-grow-1
+                span.mx-3.text-muted HOẶC
+                hr.flex-grow-1
+              
+              a.btn.btn-light.w-100.mb-4(href='/auth/google' style='background-color: #ffffff; border: 1px solid #ddd; position: relative;')
+                img(src='https://developers.google.com/identity/images/g-logo.png' alt='Google' style='width: 20px; position: absolute; left: 15px; top: 50%; transform: translateY(-50%);')
+                span.ms-4 Đăng nhập bằng Google
+            
+            .text-center
+              a.auth-link(href='/users/register') Chưa có tài khoản? Đăng ký ngay
+
+block scripts
+  script(src='/js/user-validate.js')
+  script.
+    document.getElementById('toggleLoginPasswordIcon').addEventListener('click', function() {
+      const password = document.getElementById('loginPassword');
+      const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+      password.setAttribute('type', type);
+      this.classList.toggle('fa-eye');
+      this.classList.toggle('fa-eye-slash');
+    });

@@ -1,0 +1,171 @@
+extends ../layoutManager
+
+block content
+    -
+        function getStatusBadgeClass(status) {
+            switch(parseInt(status)) {
+                case 0: return 'bg-danger';     // Đã hủy
+                case 1: return 'bg-primary';    // Đang hoạt động
+                case 2: return 'bg-success';    // Đã hoàn thành
+                case 3: return 'bg-warning';    // No-show
+                default: return 'bg-secondary';
+            }
+        }
+
+        function getStatusText(status) {
+            switch(parseInt(status)) {
+                case 0: return 'Đã hủy';
+                case 1: return 'Chờ checkin';  // Thay đổi text mặc định
+                case 2: return 'Đã hoàn thành';
+                case 3: return 'Không checkin';
+                default: return 'Không xác định';
+            }
+        }
+    
+    style.
+        .checkin-confirmed {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .waiting-checkin {
+            color: #007bff;
+        }
+
+    .container-fluid.p-4
+        .card.shadow-sm
+            .card-header.bg-white.py-3
+                h5.card-title.mb-0
+                    i.fas.fa-calendar-check.me-2.text-primary
+                    | Quản lý Đặt phòng
+
+            .card-body
+                .table-responsive
+                    table.table.table-hover.align-middle.mb-0
+                        thead.table-light
+                            tr
+                                th ID
+                                th Khách hàng
+                                th Phòng
+                                th Khách sạn
+                                th Ngày bắt đầu
+                                th Ngày kết thúc
+                                th Trạng thái
+                                th.text-end Thao tác
+                        tbody
+                            each booking in bookings || []
+                                tr(data-booking-id=booking.idDatPhong data-status=booking.trangThai)
+                                    td= booking.idDatPhong
+                                    td= booking.hoTen
+                                    td= `Phòng ${booking.idPhong}`
+                                    td= booking.tenKhachSan
+                                    td= new Date(booking.ngayBatDau).toLocaleDateString('vi-VN')
+                                    td= new Date(booking.ngayKetThuc).toLocaleDateString('vi-VN')
+                                    td.booking-status
+                                        span.badge(class=getStatusBadgeClass(booking.trangThai))
+                                            = getStatusText(booking.trangThai)
+                                    td.text-end
+                                        button.btn.btn-sm.btn-outline-primary.me-2(
+                                            onclick=`confirmCheckin(${booking.idDatPhong})`
+                                            class=`checkin-button-${booking.idDatPhong}`
+                                            disabled=booking.trangThai !== 1
+                                        )
+                                            i.fas.fa-sign-in-alt.me-1
+                                            | Xác nhận Checkin
+                                        button.btn.btn-sm.btn-outline-success.me-2(onclick=`updateStatus(${booking.idDatPhong}, 2)` disabled=booking.trangThai !== 1)
+                                            i.fas.fa-check.me-1
+                                            | Hoàn thành
+                                        button.btn.btn-sm.btn-outline-danger(onclick=`updateStatus(${booking.idDatPhong}, 0)` disabled=booking.trangThai !== 1)
+                                            i.fas.fa-times.me-1
+                                            | Hủy
+
+block scripts
+    script.
+        async function updateStatus(idDatPhong, newStatus) {
+            if (!confirm('Bạn có chắc muốn cập nhật trạng thái đặt phòng này?')) return;
+
+            try {
+                const response = await fetch(`/manager/bookings/edit/${idDatPhong}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ trangThai: newStatus })
+                });
+
+                if (!response.ok) throw new Error('Lỗi khi cập nhật trạng thái');
+
+                location.reload();
+            } catch (error) {
+                alert('Có lỗi xảy ra: ' + error.message);
+            }
+        }
+
+        async function confirmCheckin(idDatPhong) {
+            if (!confirm('Xác nhận khách hàng đã checkin?')) return;
+
+            try {
+                const response = await fetch(`/manager/bookings/confirm-checkin/${idDatPhong}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) throw new Error('Lỗi khi xác nhận checkin');
+
+                location.reload();
+            } catch (error) {
+                alert('Có lỗi xảy ra: ' + error.message);
+            }
+        }
+
+        // Kiểm tra trạng thái checkin
+        async function fetchCheckinStatus() {
+            const bookingRows = document.querySelectorAll('[data-booking-id]');
+            
+            for (const row of bookingRows) {
+                const idDatPhong = row.dataset.bookingId;
+                if (row.dataset.status == '1') { // Chỉ kiểm tra cho các đặt phòng có trạng thái 1
+                    try {
+                        const response = await fetch(`/manager/bookings/check-checkin-status/${idDatPhong}`);
+                        const data = await response.json();
+                        
+                        // Cập nhật hiển thị
+                        const statusCell = row.querySelector('.booking-status');
+                        if (statusCell) {
+                            const badgeSpan = statusCell.querySelector('.badge');
+                            if (badgeSpan) {
+                                if (data.hasCheckedIn) {
+                                    badgeSpan.textContent = 'Đã checkin';
+                                    badgeSpan.classList.add('bg-success');
+                                } else {
+                                    badgeSpan.textContent = 'Chờ checkin';
+                                }
+                            }
+                        }
+
+                        // Ẩn/hiện nút Xác nhận Checkin
+                        const checkinBtn = row.querySelector(`.checkin-button-${idDatPhong}`);
+                        if (checkinBtn && data.hasCheckedIn) {
+                            checkinBtn.style.display = 'none';
+                        }
+                    } catch (error) {
+                        console.error('Error fetching checkin status:', error);
+                    }
+                }
+            }
+        }
+
+        // Gọi khi trang đã load
+        document.addEventListener('DOMContentLoaded', fetchCheckinStatus);
+
+        // Hàm helper để lấy text trạng thái
+        function getStatusText(status) {
+            const statusMap = {
+                0: 'Đã hủy',
+                1: 'Đang hoạt động',
+                2: 'Đã hoàn thành',
+                3: 'Không checkin'
+            };
+            return statusMap[status] || 'Không xác định';
+        }

@@ -1,0 +1,60 @@
+extends ../layoutAdmin
+
+block content
+    .container-fluid.p-4
+        if cookies.adminMessage
+            .alert.alert-success.alert-dismissible.fade.show(role='alert')
+                = cookies.adminMessage
+                button.btn-close(type='button' data-bs-dismiss='alert' aria-label='Close')
+
+        if cookies.adminError
+            .alert.alert-danger.alert-dismissible.fade.show(role='alert')
+                = cookies.adminError
+                button.btn-close(type='button' data-bs-dismiss='alert' aria-label='Close')
+
+        .card.shadow-sm
+            .card-header.bg-white.py-3
+                h5.card-title.mb-0
+                    i.fas.fa-user-plus.me-2.text-primary
+                    | Thêm người dùng mới
+
+            .card-body
+                form#addUserForm.admin-form(onsubmit="return validateAddUserForm(event)")
+                    .row
+                        .col-md-6.mb-3
+                            label.form-label(for="hoTen") Họ tên
+                            input.form-control#hoTen(type="text" name="hoTen")
+                        
+                        .col-md-6.mb-3
+                            label.form-label(for="email") Email
+                            input.form-control#email(type="email" name="email")
+                        
+                        .col-md-6.mb-3
+                            label.form-label(for="soDienThoai") Số điện thoại
+                            input.form-control#soDienThoai(type="tel" name="soDienThoai")
+                        
+                        .col-md-6.mb-3
+                            label.form-label(for="diaChi") Địa chỉ
+                            input.form-control#diaChi(type="text" name="diaChi")
+                        
+                        .col-md-6.mb-3
+                            label.form-label(for="tenDangNhap") Tên đăng nhập
+                            input.form-control#tenDangNhap(type="text" name="tenDangNhap")
+                        
+                        .col-md-6.mb-3
+                            label.form-label(for="matKhau") Mật khẩu
+                            input.form-control#matKhau(type="password" name="matKhau")
+                        
+                        .col-md-6.mb-3
+                            label.form-label(for="quyenHan") Quyền hạn
+                            select.form-select#quyenHan(name="quyenHan")
+                                option(value="user") User
+                                option(value="admin") Admin
+                    
+                    .mt-3
+                        button.btn.btn-primary(type="submit")
+                            i.fas.fa-save.me-1
+                            | Thêm người dùng
+                        a.btn.btn-secondary.ms-2(href="/admin/users")
+                            i.fas.fa-times.me-1
+                            | Hủy

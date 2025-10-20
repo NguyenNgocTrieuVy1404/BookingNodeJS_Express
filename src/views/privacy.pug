@@ -1,0 +1,119 @@
+extends layouts/layout
+
+block styles
+  style.
+    .policy-card {
+      border: none;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+      margin-bottom: 2rem;
+    }
+    .policy-card:hover {
+      transform: translateY(-5px);
+    }
+    .policy-icon {
+      font-size: 2.5rem;
+      color: #0d6efd;
+      margin-bottom: 1rem;
+    }
+    .policy-title {
+      color: #0d6efd;
+      border-bottom: 2px solid #e9ecef;
+      padding-bottom: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .policy-list {
+      list-style: none;
+      padding-left: 0;
+    }
+    .policy-list li {
+      padding: 0.5rem 0;
+      position: relative;
+      padding-left: 2rem;
+    }
+    .policy-list li:before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: #198754;
+      font-weight: bold;
+    }
+    .alert-custom {
+      background-color: #f8f9fa;
+      border-left: 4px solid #0d6efd;
+    }
+
+block content
+  .container.py-5
+    .row.justify-content-center
+      .col-12.col-lg-10
+        .text-center.mb-5
+          h1.display-4.fw-bold.text-primary Chính Sách & Điều Khoản
+          p.lead.text-muted Cam kết của chúng tôi về chất lượng dịch vụ và bảo mật thông tin
+
+        .policy-card.card
+          .card-body
+            .text-center
+              i.fas.fa-calendar-check.policy-icon
+            h3.policy-title.text-center 1. Chính sách đặt phòng
+            p.card-text Chúng tôi cam kết đảm bảo quy trình đặt phòng minh bạch và thuận tiện cho khách hàng:
+            ul.policy-list
+              li Xác nhận đặt phòng tức thì qua email
+              li Hủy đặt phòng miễn phí trước 24 giờ
+              li Đảm bảo giá tốt nhất thị trường
+              li Thanh toán an toàn và bảo mật tuyệt đối
+
+        .policy-card.card
+          .card-body
+            .text-center
+              i.fas.fa-shield-alt.policy-icon
+            h3.policy-title.text-center 2. Bảo mật thông tin
+            p.card-text Chúng tôi cam kết bảo vệ thông tin cá nhân của khách hàng:
+            ul.policy-list
+              li Mã hóa thông tin thanh toán theo chuẩn quốc tế
+              li Tuyệt đối không chia sẻ thông tin với bên thứ ba
+              li Tuân thủ nghiêm ngặt quy định GDPR
+              li Áp dụng công nghệ bảo mật tiên tiến nhất
+
+        .policy-card.card
+          .card-body
+            .text-center
+              i.fas.fa-gift.policy-icon
+            h3.policy-title.text-center 3. Quyền lợi khách hàng
+            p.card-text Khách hàng của chúng tôi được hưởng các đặc quyền:
+            ul.policy-list
+              li Tích lũy điểm thưởng với mỗi lần đặt phòng
+              li Ưu đãi độc quyền dành cho thành viên
+              li Đội ngũ hỗ trợ 24/7 nhiệt tình
+              li Chính sách hoàn tiền không điều kiện nếu không hài lòng
+
+        .policy-card.card
+          .card-body
+            .text-center
+              i.fas.fa-file-contract.policy-icon
+            h3.policy-title.text-center 4. Điều khoản sử dụng
+            p.card-text Khi sử dụng dịch vụ của chúng tôi, khách hàng đồng ý:
+            ul.policy-list
+              li Cung cấp thông tin chính xác và đầy đủ
+              li Tuân thủ nội quy của khách sạn
+              li Không sử dụng dịch vụ vào mục đích phi pháp
+              li Chịu trách nhiệm về các giao dịch từ tài khoản
+
+        .policy-card.card
+          .card-body
+            .text-center
+              i.fas.fa-hands-helping.policy-icon
+            h3.policy-title.text-center 5. Giải quyết khiếu nại
+            p.card-text Quy trình xử lý khiếu nại chuyên nghiệp:
+            ul.policy-list
+              li Phản hồi nhanh chóng trong vòng 24 giờ
+              li Điều tra kỹ lưỡng mọi khiếu nại
+              li Bồi thường thỏa đáng nếu có sai sót
+              li Liên tục cải thiện dịch vụ từ phản hồi
+
+        .alert.alert-custom.mt-5
+          .d-flex.align-items-center
+            i.fas.fa-info-circle.fa-2x.text-primary.me-3
+            div
+              h4.alert-heading.mb-2 Lưu ý quan trọng
+              p.mb-0 Các chính sách và điều khoản có thể được cập nhật theo thời gian. Vui lòng theo dõi thường xuyên để nắm bắt những thay đổi mới nhất. 

@@ -1,0 +1,215 @@
+extends layouts/layout
+
+block content
+  style.
+    .profile-container {
+      max-width: 600px;
+      margin: 1.5rem auto;
+      padding: 1.5rem;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      transform-style: preserve-3d;
+      perspective: 1000px;
+      animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .profile-header {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      transform: translateZ(30px);
+    }
+
+    .profile-header h2 {
+      color: #2c3e50;
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.8rem;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+      position: relative;
+      transform: translateZ(20px);
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.3rem;
+      color: #34495e;
+      font-weight: 600;
+      font-size: 0.85rem;
+      transform: translateZ(10px);
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.6rem;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.9);
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      font-size: 0.9rem;
+    }
+
+    .form-control:focus {
+      border-color: #3498db;
+      box-shadow: 0 0 12px rgba(52, 152, 219, 0.3);
+      transform: translateZ(5px);
+    }
+
+    .btn-container {
+      display: flex;
+      gap: 0.8rem;
+      margin-top: 1.5rem;
+      justify-content: center;
+      transform: translateZ(25px);
+    }
+
+    .btn {
+      padding: 0.6rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      font-size: 0.85rem;
+    }
+
+    .btn-primary {
+      background: linear-gradient(45deg, #3498db, #2980b9);
+      color: white;
+    }
+
+    .btn-secondary {
+      background: linear-gradient(45deg, #95a5a6, #7f8c8d);
+      color: white;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    .alert {
+      padding: 0.8rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      animation: slideIn 0.5s ease-out;
+      font-size: 0.9rem;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateY(-15px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .alert-success {
+      background: linear-gradient(45deg, #2ecc71, #27ae60);
+      color: white;
+      box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+    }
+
+    .alert-danger {
+      background: linear-gradient(45deg, #e74c3c, #c0392b);
+      color: white;
+      box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+    }
+
+    .profile-section {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 1.2rem;
+      border-radius: 12px;
+      margin-bottom: 1.2rem;
+      transition: all 0.3s ease;
+    }
+
+    .profile-section h3 {
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+      color: #2c3e50;
+    }
+
+    .profile-section:hover {
+      transform: translateZ(10px);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    }
+
+  .profile-container
+    .profile-header
+      h2
+        i.fas.fa-user-circle.me-2
+        | Hồ sơ cá nhân
+
+    if error
+      .alert.alert-danger
+        i.fas.fa-exclamation-circle.me-2
+        = error
+
+    if success
+      .alert.alert-success
+        i.fas.fa-check-circle.me-2
+        = success
+
+    form(action='/profile' method='POST')
+      .profile-section
+        h3
+          i.fas.fa-info-circle.me-2
+          | Thông tin cơ bản
+        .form-group
+          label(for='hoTen')
+            i.fas.fa-user.me-2
+            | Họ tên
+          input#hoTen.form-control(type='text' name='hoTen' value=profileData.hoTen required)
+
+        .form-group
+          label(for='email')
+            i.fas.fa-envelope.me-2
+            | Email
+          input#email.form-control(type='email' name='email' value=profileData.email required readonly)
+
+      .profile-section
+        h3
+          i.fas.fa-address-card.me-2
+          | Thông tin liên hệ
+        .form-group
+          label(for='soDienThoai')
+            i.fas.fa-phone.me-2
+            | Số điện thoại
+          input#soDienThoai.form-control(type='text' name='soDienThoai' value=profileData.soDienThoai required)
+
+        .form-group
+          label(for='diaChi')
+            i.fas.fa-map-marker-alt.me-2
+            | Địa chỉ
+          input#diaChi.form-control(type='text' name='diaChi' value=profileData.diaChi required)
+
+      .profile-section
+        h3
+          i.fas.fa-lock.me-2
+          | Bảo mật
+        .form-group
+          label(for='matKhau')
+            i.fas.fa-key.me-2
+            | Mật khẩu mới
+          input#matKhau.form-control(type='password' name='matKhau' placeholder='Nhập mật khẩu mới nếu muốn thay đổi')
+
+      .btn-container
+        button.btn.btn-primary(type='submit')
+          i.fas.fa-save.me-2
+          | Lưu thay đổi
+        a.btn.btn-secondary(href='/')
+          i.fas.fa-arrow-left.me-2
+          | Quay lại

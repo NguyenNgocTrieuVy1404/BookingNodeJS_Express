@@ -1,0 +1,83 @@
+extends layouts/layout
+
+block styles
+  style.
+    .contact-card {
+      border: none;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+    }
+    .contact-card:hover {
+      transform: translateY(-5px);
+    }
+    .contact-icon {
+      font-size: 2.5rem;
+      color: #0d6efd;
+      transition: transform 0.3s ease;
+    }
+    .contact-card:hover .contact-icon {
+      transform: scale(1.1);
+    }
+    .contact-info a {
+      color: #0d6efd;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+    .contact-info a:hover {
+      color: #0a58ca;
+    }
+    .map-container {
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      margin-top: 2rem;
+    }
+
+block content
+  .container.py-5
+    .row.justify-content-center
+      .col-12.col-lg-10
+        .text-center.mb-5
+          h1.display-4.fw-bold.text-primary Liên Hệ Với Chúng Tôi
+          p.lead.text-muted Chúng tôi luôn sẵn sàng hỗ trợ bạn 24/7
+        
+    .row.justify-content-center
+      .col-md-8.mb-4
+        .contact-card.card.p-4
+          .d-flex.mb-4.align-items-center
+            i.fas.fa-map-marker-alt.contact-icon.me-3
+            .contact-info
+              h5.fw-bold Địa chỉ
+              p.mb-0 123 Đường ABC, Quận XYZ
+              p.mb-0 TP. Hồ Chí Minh, Việt Nam
+          
+          .d-flex.mb-4.align-items-center
+            i.fas.fa-phone-alt.contact-icon.me-3
+            .contact-info
+              h5.fw-bold Điện thoại
+              p.mb-0 
+                a(href="tel:1900xxxx") 1900 XXXX
+                br
+                a(href="tel:0123456789") 0123 456 789
+          
+          .d-flex.mb-4.align-items-center
+            i.fas.fa-envelope.contact-icon.me-3
+            .contact-info
+              h5.fw-bold Email
+              p.mb-0
+                a(href="mailto:support@hotelbooking.com") support@hotelbooking.com
+                br
+                a(href="mailto:info@hotelbooking.com") info@hotelbooking.com
+          
+          .d-flex.align-items-center
+            i.fas.fa-clock.contact-icon.me-3
+            .contact-info
+              h5.fw-bold Giờ làm việc
+              p.mb-0 24/7 - Luôn sẵn sàng phục vụ
+              p.mb-0 Hỗ trợ khách hàng mọi lúc
+
+    .row
+      .col-12
+        h3.text-center.mb-4.text-primary.fw-bold Vị Trí Của Chúng Tôi
+        .map-container
+          iframe(src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.123456789!2d106.12345678901234!3d10.123456789012345!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTDCsDA3JzM0LjQiTiAxMDbCsDA3JzM0LjQiRQ!5e0!3m2!1svi!2s!4v1234567890123!5m2!1svi!2s", width="100%", height="450", style="border:0;", allowfullscreen="", loading="lazy")

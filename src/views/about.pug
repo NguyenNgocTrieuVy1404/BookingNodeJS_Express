@@ -1,0 +1,119 @@
+extends layouts/layout
+
+block styles
+  style.
+    .about-section {
+      position: relative;
+      overflow: hidden;
+    }
+    .about-image {
+      border-radius: 20px;
+      box-shadow: 0 0 30px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+    }
+    .about-image:hover {
+      transform: scale(1.02);
+    }
+    .feature-card {
+      border: none;
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+      height: 100%;
+    }
+    .feature-card:hover {
+      transform: translateY(-10px);
+    }
+    .feature-icon {
+      font-size: 3rem;
+      color: #0d6efd;
+      margin-bottom: 1.5rem;
+      transition: transform 0.3s ease;
+    }
+    .feature-card:hover .feature-icon {
+      transform: scale(1.1);
+    }
+    .check-list {
+      list-style: none;
+      padding-left: 0;
+    }
+    .check-list li {
+      padding: 0.5rem 0;
+      position: relative;
+      padding-left: 2rem;
+      font-size: 1.1rem;
+    }
+    .check-list li i {
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #198754;
+    }
+    .commitment-section {
+      background: linear-gradient(45deg, #0d6efd, #0a58ca);
+      color: white;
+      border-radius: 20px;
+      padding: 3rem;
+      margin-top: 4rem;
+    }
+
+block content
+  .container.py-5
+    .row.justify-content-center
+      .col-12.col-lg-10
+        .text-center.mb-5
+          h1.display-4.fw-bold.text-primary Về Chúng Tôi
+          p.lead.text-muted Đối tác đáng tin cậy cho mọi hành trình của bạn
+    
+    .about-section
+      .row.align-items-center.mb-5
+        .col-md-6.mb-4.mb-md-0
+          img.about-image.img-fluid.w-100(src="/img/about-hotel.jpg", alt="Hotel Booking System")
+        .col-md-6
+          h2.fw-bold.text-primary.mb-4 Hotel Booking
+          h3.text-muted.mb-4 Đặt Phòng Khách Sạn Trực Tuyến
+          p.lead.mb-4 Hotel Booking là hệ thống đặt phòng khách sạn trực tuyến hàng đầu tại Việt Nam, cung cấp dịch vụ đặt phòng an toàn, tiện lợi và chuyên nghiệp.
+          
+          h4.fw-bold.mb-3 Tại sao chọn chúng tôi?
+          ul.check-list
+            li
+              i.fas.fa-check-circle.me-2
+              | Đa dạng lựa chọn với hơn 1000+ khách sạn
+            li
+              i.fas.fa-check-circle.me-2
+              | Giá cả cạnh tranh và nhiều ưu đãi hấp dẫn
+            li
+              i.fas.fa-check-circle.me-2
+              | Đặt phòng nhanh chóng, thanh toán an toàn
+            li
+              i.fas.fa-check-circle.me-2
+              | Hỗ trợ khách hàng 24/7
+    
+    .row.mt-5.g-4
+      .col-md-4
+        .feature-card.card.text-center.p-4
+          .card-body
+            i.fas.fa-hotel.feature-icon
+            h4.fw-bold.mb-3 Đa dạng lựa chọn
+            p.mb-0 Từ khách sạn bình dân đến 5 sao sang trọng, đáp ứng mọi nhu cầu và ngân sách của khách hàng.
+      
+      .col-md-4
+        .feature-card.card.text-center.p-4
+          .card-body
+            i.fas.fa-shield-alt.feature-icon
+            h4.fw-bold.mb-3 An toàn & Bảo mật
+            p.mb-0 Bảo mật thông tin cá nhân và giao dịch thanh toán của khách hàng là ưu tiên hàng đầu.
+      
+      .col-md-4
+        .feature-card.card.text-center.p-4
+          .card-body
+            i.fas.fa-headset.feature-icon
+            h4.fw-bold.mb-3 Hỗ trợ tận tâm
+            p.mb-0 Đội ngũ chăm sóc khách hàng chuyên nghiệp, sẵn sàng hỗ trợ mọi lúc mọi nơi.
+
+    .commitment-section
+      .row
+        .col-12.text-center
+          h3.fw-bold.mb-4 Cam kết của chúng tôi
+          p.lead.mb-0 Chúng tôi cam kết mang đến trải nghiệm đặt phòng tốt nhất cho khách hàng với dịch vụ chuyên nghiệp, giá cả hợp lý và sự hài lòng tuyệt đối. 

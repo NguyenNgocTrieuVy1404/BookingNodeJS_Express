@@ -1,0 +1,270 @@
+extends ../layoutAdmin
+
+block content
+    .container-fluid.p-4
+        if cookies.adminMessage
+            .alert.alert-success.alert-dismissible.fade.show(role='alert')
+                = cookies.adminMessage
+                button.btn-close(type='button' data-bs-dismiss='alert' aria-label='Close')
+
+        if cookies.adminError
+            .alert.alert-danger.alert-dismissible.fade.show(role='alert')
+                = cookies.adminError
+                button.btn-close(type='button' data-bs-dismiss='alert' aria-label='Close')
+
+        .card.shadow-sm
+            .card-header.bg-white.py-3
+                h5.card-title.mb-0
+                    i.fas.fa-calendar-plus.me-2.text-primary
+                    | Thêm đặt phòng mới
+
+            .card-body
+                // Phần tìm kiếm khách hàng
+                .card.mb-4
+                    .card-header.bg-light Tìm kiếm khách hàng theo số điện thoại
+                    .card-body
+                        .row
+                            .col-md-6
+                                .input-group.mb-3
+                                    input.form-control#searchPhone(type="text" placeholder="Nhập số điện thoại" aria-label="Số điện thoại")
+                                    button.btn.btn-primary#searchCustomerBtn(type="button")
+                                        i.fas.fa-search.me-1
+                                        | Tìm
+                            .col-md-6
+                                #searchResults.mt-1
+                                    span.text-muted Nhập số điện thoại để tìm kiếm khách hàng
+
+                form#addBookingForm.admin-form(action="/admin/bookings/add" method="POST" onsubmit="return validateAddBookingForm(event)")
+                    .row
+                        .col-md-6.mb-3
+                            label.form-label(for="idKhachHang") Khách hàng
+                            select.form-select#idKhachHang(name="idKhachHang" required)
+                                option(value="" selected disabled) Chọn khách hàng
+                                each customer in customers
+                                    option(value=customer.idKhachHang data-name=customer.hoTen data-email=customer.email data-phone=customer.soDienThoai)= customer.hoTen
+                            .invalid-feedback Vui lòng chọn khách hàng
+
+                        .col-md-6.mb-3
+                            label.form-label(for="customerInfo") Thông tin khách hàng
+                            input.form-control#customerInfo(type="text" readonly)
+
+                        .col-md-6.mb-3
+                            label.form-label(for="idPhong") Phòng
+                            select.form-select#idPhong(name="idPhong" required)
+                                option(value="" selected disabled) Chọn phòng
+                                each room in rooms
+                                    option(value=room.idPhong data-hotel=room.tenKhachSan data-price=room.giaPhong)= `Phòng ${room.idPhong} - ${room.tenKhachSan}`
+                            .invalid-feedback Vui lòng chọn phòng
+
+                        .col-md-6.mb-3
+                            label.form-label(for="roomInfo") Thông tin phòng
+                            input.form-control#roomInfo(type="text" readonly)
+
+                        .col-md-6.mb-3
+                            label.form-label(for="ngayBatDau") Ngày bắt đầu
+                            input.form-control#ngayBatDau(type="date" name="ngayBatDau" required)
+                            .invalid-feedback Vui lòng chọn ngày bắt đầu
+
+                        .col-md-6.mb-3
+                            label.form-label(for="ngayKetThuc") Ngày kết thúc
+                            input.form-control#ngayKetThuc(type="date" name="ngayKetThuc" required)
+                            .invalid-feedback Vui lòng chọn ngày kết thúc
+
+                        .col-md-6.mb-3
+                            label.form-label(for="trangThai") Trạng thái
+                            select.form-select#trangThai(name="trangThai" required)
+                                option(value="1") Đang hoạt động
+                                option(value="0") Đã hủy
+                            .invalid-feedback Vui lòng chọn trạng thái
+
+                    .mt-3
+                        button.btn.btn-primary(type="submit")
+                            i.fas.fa-save.me-1
+                            | Thêm đặt phòng
+                        a.btn.btn-secondary.ms-2(href="/admin/bookings")
+                            i.fas.fa-times.me-1
+                            | Hủy
+
+block scripts
+    script.
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchPhoneInput = document.getElementById('searchPhone');
+            const searchBtn = document.getElementById('searchCustomerBtn');
+            const searchResults = document.getElementById('searchResults');
+            const customerSelect = document.getElementById('idKhachHang');
+            const customerInfo = document.getElementById('customerInfo');
+            const roomSelect = document.getElementById('idPhong');
+            const roomInfo = document.getElementById('roomInfo');
+            const startDateInput = document.getElementById('ngayBatDau');
+            const endDateInput = document.getElementById('ngayKetThuc');
+
+            // Set min date attributes to prevent selecting past dates
+            const today = new Date();
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            
+            // Format dates for input elements
+            const formatDateForInput = (date) => {
+                return date.toISOString().split('T')[0];
+            };
+            
+            // Set minimum dates
+            const todayFormatted = formatDateForInput(today);
+            startDateInput.setAttribute('min', todayFormatted);
+            endDateInput.setAttribute('min', todayFormatted);
+            
+            // Set default dates
+            startDateInput.value = todayFormatted;
+            endDateInput.value = formatDateForInput(tomorrow);
+            
+            // Update min date for checkout when checkin changes
+            startDateInput.addEventListener('change', function() {
+                const startDate = new Date(this.value);
+                
+                // Ensure selected date is not in the past
+                if (startDate < today) {
+                    alert('Không thể chọn ngày trong quá khứ');
+                    this.value = todayFormatted;
+                    return;
+                }
+                
+                // Calculate next day after selected start date
+                const nextDay = new Date(startDate);
+                nextDay.setDate(nextDay.getDate() + 1);
+                
+                // Update min attribute of checkout date
+                const minCheckout = formatDateForInput(nextDay);
+                endDateInput.setAttribute('min', minCheckout);
+                
+                // If current checkout date is before new start date, update it
+                const endDate = new Date(endDateInput.value);
+                if (endDate <= startDate) {
+                    endDateInput.value = minCheckout;
+                }
+            });
+            
+            endDateInput.addEventListener('change', function() {
+                const startDate = new Date(startDateInput.value);
+                const endDate = new Date(this.value);
+                
+                // Get minimum allowed checkout date (day after check-in)
+                const minCheckout = new Date(startDate);
+                minCheckout.setDate(minCheckout.getDate() + 1);
+                
+                // Ensure end date is after start date
+                if (endDate <= startDate) {
+                    alert('Ngày kết thúc phải sau ngày bắt đầu ít nhất 1 ngày');
+                    this.value = formatDateForInput(minCheckout);
+                }
+            });
+            
+            // Search for customer
+            searchBtn.addEventListener('click', function() {
+                const phoneNumber = searchPhoneInput.value.trim();
+                if (!phoneNumber) {
+                    searchResults.innerHTML = '<div class="text-danger">Vui lòng nhập số điện thoại để tìm kiếm</div>';
+                    return;
+                }
+                
+                searchResults.innerHTML = '<div class="spinner-border spinner-border-sm text-primary" role="status"><span class="visually-hidden">Đang tìm kiếm...</span></div> Đang tìm kiếm...';
+                
+                fetch(`/admin/customers/search?phone=${encodeURIComponent(phoneNumber)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success && data.data.length > 0) {
+                            // Hiển thị kết quả tìm kiếm
+                            const resultHTML = `
+                                <div class="list-group mt-2">
+                                    ${data.data.map(customer => `
+                                        <button type="button" class="list-group-item list-group-item-action select-customer"
+                                            data-id="${customer.idKhachHang}"
+                                            data-name="${customer.hoTen}"
+                                            data-email="${customer.email || ''}"
+                                            data-phone="${customer.soDienThoai || ''}">
+                                            <div class="d-flex w-100 justify-content-between">
+                                                <h6 class="mb-1">${customer.hoTen}</h6>
+                                                <small>${customer.soDienThoai || 'Không có SĐT'}</small>
+                                            </div>
+                                            <small>${customer.email || 'Không có email'}</small>
+                                        </button>
+                                    `).join('')}
+                                </div>
+                            `;
+                            searchResults.innerHTML = resultHTML;
+                            
+                            // Thêm sự kiện click cho kết quả tìm kiếm
+                            document.querySelectorAll('.select-customer').forEach(btn => {
+                                btn.addEventListener('click', function() {
+                                    const id = this.getAttribute('data-id');
+                                    const name = this.getAttribute('data-name');
+                                    const email = this.getAttribute('data-email');
+                                    const phone = this.getAttribute('data-phone');
+                                    
+                                    // Chọn khách hàng trong select box
+                                    customerSelect.value = id;
+                                    customerInfo.value = `${name} | ${phone} | ${email}`;
+                                    
+                                    // Ẩn kết quả tìm kiếm
+                                    searchResults.innerHTML = `<div class="text-success">Đã chọn: ${name}</div>`;
+                                });
+                            });
+                        } else {
+                            searchResults.innerHTML = '<div class="text-danger">Không tìm thấy khách hàng phù hợp</div>';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error searching for customer:', error);
+                        searchResults.innerHTML = '<div class="text-danger">Có lỗi xảy ra khi tìm kiếm</div>';
+                    });
+            });
+            
+            // Enter key on search field
+            searchPhoneInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    searchBtn.click();
+                }
+            });
+            
+            // Update customer info when selected
+            customerSelect.addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                if (selectedOption.value) {
+                    const name = selectedOption.getAttribute('data-name');
+                    const email = selectedOption.getAttribute('data-email') || '';
+                    const phone = selectedOption.getAttribute('data-phone') || '';
+                    customerInfo.value = `${name} | ${phone} | ${email}`;
+                } else {
+                    customerInfo.value = '';
+                }
+            });
+            
+            // Update room info when selected
+            roomSelect.addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                if (selectedOption.value) {
+                    const hotel = selectedOption.getAttribute('data-hotel');
+                    const price = selectedOption.getAttribute('data-price');
+                    roomInfo.value = `${hotel} | Giá: ${formatCurrency(price)}`;
+                } else {
+                    roomInfo.value = '';
+                }
+            });
+            
+            // Helper function to format currency
+            function formatCurrency(amount) {
+                return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+            }
+        });
+        
+        // Form validation
+        function validateAddBookingForm(event) {
+            const form = event.target;
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+                form.classList.add('was-validated');
+                return false;
+            }
+            return true;
+        }

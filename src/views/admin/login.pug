@@ -1,0 +1,111 @@
+extends ../layoutAdmin
+
+block content
+    .container
+        .row.justify-content-center.align-items-center.min-vh-100
+            .col-md-6.col-lg-5
+                .card.shadow-lg.border-0
+                    .card-body.p-5
+                        .text-center.mb-4
+                            i.fas.fa-shield-alt.fa-3x.text-primary.mb-3
+                            h2.card-title.mb-4 Đăng nhập Admin
+                            
+                        if error
+                            .alert.alert-danger.d-flex.align-items-center
+                                i.fas.fa-exclamation-circle.me-2
+                                = error
+
+                        form(method="POST" action="/admin/login")
+                            .form-group.mb-4
+                                label.form-label.fw-medium(for="tenDangNhap") 
+                                    i.fas.fa-user.me-2
+                                    | Tên đăng nhập
+                                .input-group
+                                    input#tenDangNhap.form-control.form-control-lg(
+                                        type="text" 
+                                        name="tenDangNhap" 
+                                        value=lastUsername 
+                                        required
+                                        placeholder="Nhập tên đăng nhập"
+                                    )
+
+                            .form-group.mb-4
+                                label.form-label.fw-medium(for="matKhau")
+                                    i.fas.fa-lock.me-2
+                                    | Mật khẩu
+                                .input-group
+                                    input#matKhau.form-control.form-control-lg(
+                                        type="password" 
+                                        name="matKhau" 
+                                        required
+                                        placeholder="Nhập mật khẩu"
+                                    )
+                                    button.btn.btn-outline-secondary#togglePassword(
+                                        type="button"
+                                        tabindex="-1"
+                                    )
+                                        i.fas.fa-eye
+
+                            button.btn.btn-primary.btn-lg.w-100.mb-3(type="submit")
+                                i.fas.fa-sign-in-alt.me-2
+                                | Đăng nhập
+
+                            .text-center.text-muted
+                                small Chỉ dành cho quản trị viên hệ thống
+
+    style.
+        .card {
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .form-control {
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            padding: 12px;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(79, 70, 229, 0.15);
+        }
+
+        .btn-primary {
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+        }
+
+        .text-primary {
+            color: var(--primary-color) !important;
+        }
+
+        .input-group-text {
+            background: transparent;
+            border-left: none;
+        }
+
+        #togglePassword {
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+
+    script.
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const matKhau = document.getElementById('matKhau');
+            const type = matKhau.getAttribute('type') === 'password' ? 'text' : 'password';
+            matKhau.setAttribute('type', type);
+            
+            const icon = this.querySelector('i');
+            icon.classList.toggle('fa-eye');
+            icon.classList.toggle('fa-eye-slash');
+        }); 

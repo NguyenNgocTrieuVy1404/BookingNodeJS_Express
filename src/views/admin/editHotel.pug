@@ -1,0 +1,512 @@
+extends ../layoutAdmin
+
+block content
+    #notificationContainer.position-fixed.top-0.end-0.p-3(style="z-index: 1060; max-width: 380px;")
+        // Thông báo sẽ được thêm vào đây bằng JavaScript
+
+    .container-fluid.p-4
+        if cookies.adminMessage
+            .alert.alert-success.alert-dismissible.fade.show(role='alert')
+                = cookies.adminMessage
+                button.btn-close(type='button' data-bs-dismiss='alert' aria-label='Close')
+
+        if cookies.adminError
+            .alert.alert-danger.alert-dismissible.fade.show(role='alert')
+                = cookies.adminError
+                button.btn-close(type='button' data-bs-dismiss='alert' aria-label='Close')
+
+        .card.shadow-sm
+            .card-header.bg-white.py-3
+                h5.card-title.mb-0
+                    i.fas.fa-hotel.me-2.text-primary
+                    | Chỉnh sửa thông tin khách sạn
+
+            .card-body
+                form#editHotelForm.admin-form(action=`/admin/hotels/edit/${hotel.idKhachSan}` method="POST" enctype="multipart/form-data" novalidate)
+                    .row
+                        .col-md-6.mb-3
+                            label.form-label(for="tenKhachSan") Tên khách sạn*
+                            input.form-control#tenKhachSan(type="text" name="tenKhachSan" value=hotel.tenKhachSan required minlength="3" maxlength="100")
+                            .invalid-feedback Tên khách sạn không được để trống và phải từ 3-100 ký tự
+                        
+                        .col-md-6.mb-3
+                            label.form-label(for="phuong") Phường*
+                            input.form-control#phuong(type="text" name="phuong" value=hotel.phuong required)
+                            .invalid-feedback Vui lòng nhập phường
+                        
+                        .col-md-6.mb-3
+                            label.form-label(for="quan") Quận*
+                            input.form-control#quan(type="text" name="quan" value=hotel.quan required)
+                            .invalid-feedback Vui lòng nhập quận
+                        
+                        .col-md-6.mb-3
+                            label.form-label(for="thanhPho") Thành phố*
+                            input.form-control#thanhPho(type="text" name="thanhPho" value=hotel.thanhPho required)
+                            .invalid-feedback Vui lòng nhập thành phố
+                        
+                        .col-md-6.mb-3
+                            label.form-label(for="idDiaDiem") Địa điểm*
+                            select.form-select#idDiaDiem(name="idDiaDiem" required)
+                                option(value="" disabled) Chọn địa điểm
+                                each diadiem in diadiems
+                                    option(value=diadiem.idDiaDiem selected=diadiem.idDiaDiem === hotel.idDiaDiem)= diadiem.tenDiaDiem
+                            .invalid-feedback Vui lòng chọn địa điểm
+                        
+                        .col-md-6.mb-3
+                            label.form-label(for="hinhAnh") Hình ảnh
+                            input.form-control#hinhAnh(type="file" name="hinhAnh" accept="image/jpeg,image/png,image/jpg")
+                            small.form-text.text-muted Chọn file ảnh mới (để trống nếu không thay đổi)
+                            .invalid-feedback Chỉ chấp nhận file ảnh (jpg, jpeg, png) và kích thước tối đa 5MB
+                            
+                        if hotel.hinhAnh
+                            .col-md-12.mt-3
+                                .card
+                                    .card-header Hình ảnh hiện tại
+                                    .card-body
+                                        img.img-thumbnail(src=hotel.hinhAnh.startsWith && hotel.hinhAnh.startsWith('http') ? hotel.hinhAnh : `/hotels/${hotel.hinhAnh}` alt=hotel.tenKhachSan style="max-width: 250px;")
+                    
+                    .mt-3
+                        button.btn.btn-primary(type="submit")
+                            i.fas.fa-save.me-1
+                            | Lưu thay đổi
+                        a.btn.btn-secondary.ms-2(href="/admin/hotels")
+                            i.fas.fa-times.me-1
+                            | Hủy
+                        p.mt-2.small.text-muted Các trường có dấu * là bắt buộc
+
+block scripts
+    style.
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(0.95); }
+            70% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes progress {
+            from { width: 100%; }
+            to { width: 0%; }
+        }
+        
+        .custom-toast {
+            position: relative;
+            opacity: 1;
+            background: #fff;
+            margin-bottom: 16px;
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            align-items: stretch;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.15), 0 5px 10px -5px rgba(0,0,0,0.1);
+            animation: slideInRight 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+            max-width: 100%;
+            transform-origin: right center;
+            backdrop-filter: blur(10px);
+        }
+        
+        .custom-toast.closing {
+            animation: slideOutRight 0.5s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards;
+        }
+        
+        .toast-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 60px;
+            font-size: 26px;
+            padding: 0 5px;
+            animation: pulse 0.6s ease-in-out;
+        }
+        
+        .toast-content {
+            flex-grow: 1;
+            padding: 16px 15px;
+            position: relative;
+        }
+        
+        .toast-title {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 6px;
+            letter-spacing: 0.2px;
+        }
+        
+        .toast-message {
+            font-size: 14px;
+            opacity: 0.85;
+            line-height: 1.5;
+            margin-right: 20px;
+        }
+        
+        .toast-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: transparent;
+            border: none;
+            font-size: 18px;
+            width: 24px;
+            height: 24px;
+            line-height: 1;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            padding: 0;
+        }
+        
+        .toast-close:hover {
+            opacity: 1;
+            background: rgba(0,0,0,0.05);
+            transform: rotate(90deg);
+        }
+        
+        .toast-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            width: 100%;
+            background: rgba(255,255,255,0.4);
+        }
+        
+        .toast-progress-bar {
+            height: 100%;
+            width: 100%;
+        }
+        
+        .toast-success {
+            border-left: none;
+            background: linear-gradient(145deg, #ffffff, #f8f9fa);
+        }
+        
+        .toast-success .toast-icon {
+            background: linear-gradient(145deg, #28a745, #218838);
+            color: white;
+        }
+        
+        .toast-success .toast-progress-bar {
+            background: linear-gradient(90deg, #28a745, #5cb85c);
+            animation: progress 5s linear forwards;
+        }
+        
+        .toast-error {
+            border-left: none;
+            background: linear-gradient(145deg, #ffffff, #f8f9fa);
+        }
+        
+        .toast-error .toast-icon {
+            background: linear-gradient(145deg, #dc3545, #c82333);
+            color: white;
+        }
+        
+        .toast-error .toast-progress-bar {
+            background: linear-gradient(90deg, #dc3545, #f55a4e);
+            animation: progress 5s linear forwards;
+        }
+        
+        .toast-warning {
+            border-left: none;
+            background: linear-gradient(145deg, #ffffff, #f8f9fa);
+        }
+        
+        .toast-warning .toast-icon {
+            background: linear-gradient(145deg, #ffc107, #e0a800);
+            color: #212529;
+        }
+        
+        .toast-warning .toast-progress-bar {
+            background: linear-gradient(90deg, #ffc107, #ffdb4a);
+            animation: progress 5s linear forwards;
+        }
+        
+        .toast-info {
+            border-left: none;
+            background: linear-gradient(145deg, #ffffff, #f8f9fa);
+        }
+        
+        .toast-info .toast-icon {
+            background: linear-gradient(145deg, #17a2b8, #138496);
+            color: white;
+        }
+        
+        .toast-info .toast-progress-bar {
+            background: linear-gradient(90deg, #17a2b8, #4fbcce);
+            animation: progress 5s linear forwards;
+        }
+        
+        /* Thêm style cho validation */
+        .was-validated .form-control:invalid,
+        .form-control.is-invalid {
+            border-color: #dc3545;
+            padding-right: calc(1.5em + 0.75rem);
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right calc(0.375em + 0.1875rem) center;
+            background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+        }
+        
+        .was-validated .form-control:valid,
+        .form-control.is-valid {
+            border-color: #198754;
+            padding-right: calc(1.5em + 0.75rem);
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23198754' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right calc(0.375em + 0.1875rem) center;
+            background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+        }
+
+    script.
+        // Hệ thống thông báo
+        class NotificationSystem {
+            constructor() {
+                this.container = document.getElementById('notificationContainer');
+                this.counter = 0;
+                this.notifications = {};
+            }
+            
+            // Hiển thị thông báo
+            show(message, options = {}) {
+                const { 
+                    type = 'success', 
+                    title = this._getDefaultTitle(type),
+                    icon = this._getDefaultIcon(type),
+                    duration = 5000 
+                } = options;
+                
+                const id = `toast-${++this.counter}`;
+                
+                // Tạo toast element
+                const toast = document.createElement('div');
+                toast.className = `custom-toast toast-${type}`;
+                toast.id = id;
+                toast.innerHTML = `
+                    <div class="toast-icon">
+                        <i class="${icon}"></i>
+                    </div>
+                    <div class="toast-content">
+                        <div class="toast-title">${title}</div>
+                        <div class="toast-message">${message}</div>
+                        <button type="button" class="toast-close" aria-label="Đóng">
+                            <i class="fas fa-times"></i>
+                        </button>
+                        <div class="toast-progress">
+                            <div class="toast-progress-bar"></div>
+                        </div>
+                    </div>
+                `;
+                
+                // Thêm vào container
+                this.container.appendChild(toast);
+                
+                // Lưu tham chiếu để có thể hủy nếu cần
+                this.notifications[id] = {
+                    element: toast,
+                    timeout: null
+                };
+                
+                // Thêm sự kiện click cho nút đóng
+                const closeBtn = toast.querySelector('.toast-close');
+                closeBtn.addEventListener('click', () => {
+                    this._hideToast(id);
+                });
+                
+                // Tự động ẩn sau duration
+                if (duration > 0) {
+                    // Cài đặt thời gian đóng thông báo
+                    this.notifications[id].timeout = setTimeout(() => {
+                        this._hideToast(id);
+                    }, duration);
+                    
+                    // Cập nhật thời gian của progress bar
+                    const progressBar = toast.querySelector('.toast-progress-bar');
+                    progressBar.style.animationDuration = `${duration}ms`;
+                }
+                
+                return id;
+            }
+            
+            // Ẩn thông báo
+            _hideToast(id) {
+                const notification = this.notifications[id];
+                if (!notification) return;
+                
+                const { element, timeout } = notification;
+                
+                // Xóa timeout nếu có
+                if (timeout) {
+                    clearTimeout(timeout);
+                }
+                
+                // Thêm class closing để bắt đầu animation ẩn
+                element.classList.add('closing');
+                
+                // Xóa sau khi animation hoàn thành
+                setTimeout(() => {
+                    if (element.parentNode) {
+                        element.parentNode.removeChild(element);
+                    }
+                    delete this.notifications[id];
+                }, 500); // Thời gian bằng với thời gian của animation slideOutRight
+            }
+            
+            // Ẩn tất cả thông báo
+            hideAll() {
+                Object.keys(this.notifications).forEach(id => {
+                    this._hideToast(id);
+                });
+            }
+            
+            // Lấy tiêu đề mặc định theo loại
+            _getDefaultTitle(type) {
+                switch(type) {
+                    case 'success': return 'Thành công!';
+                    case 'error': return 'Lỗi!';
+                    case 'warning': return 'Cảnh báo!';
+                    case 'info': return 'Thông tin';
+                    default: return 'Thông báo';
+                }
+            }
+            
+            // Lấy icon mặc định theo loại
+            _getDefaultIcon(type) {
+                switch(type) {
+                    case 'success': return 'fas fa-check-circle';
+                    case 'error': return 'fas fa-times-circle';
+                    case 'warning': return 'fas fa-exclamation-triangle';
+                    case 'info': return 'fas fa-info-circle';
+                    default: return 'fas fa-bell';
+                }
+            }
+            
+            // Hiển thị thông báo thành công
+            success(message, options = {}) {
+                return this.show(message, { ...options, type: 'success' });
+            }
+            
+            // Hiển thị thông báo lỗi
+            error(message, options = {}) {
+                return this.show(message, { ...options, type: 'error' });
+            }
+            
+            // Hiển thị cảnh báo
+            warning(message, options = {}) {
+                return this.show(message, { ...options, type: 'warning' });
+            }
+            
+            // Hiển thị thông tin
+            info(message, options = {}) {
+                return this.show(message, { ...options, type: 'info' });
+            }
+        }
+
+        // Khởi tạo hệ thống thông báo
+        const notifications = new NotificationSystem();
+
+        // Hiển thị thông báo từ cookie
+        document.addEventListener('DOMContentLoaded', function() {
+            const getCookie = (name) => {
+                const value = `; ${document.cookie}`;
+                const parts = value.split(`; ${name}=`);
+                if (parts.length === 2) return parts.pop().split(';').shift();
+            };
+            
+            const adminMessage = getCookie('adminMessage');
+            const adminError = getCookie('adminError');
+            
+            // Hiển thị thông báo thành công
+            if (adminMessage) {
+                const message = decodeURIComponent(adminMessage);
+                notifications.success(message);
+                document.cookie = 'adminMessage=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            }
+            
+            // Hiển thị thông báo lỗi
+            if (adminError) {
+                const message = decodeURIComponent(adminError);
+                notifications.error(message);
+                document.cookie = 'adminError=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            }
+            
+            // Thêm validation cho form
+            const form = document.getElementById('editHotelForm');
+            if (form) {
+                // Xử lý sự kiện submit form
+                form.addEventListener('submit', function(event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        
+                        // Hiển thị thông báo lỗi
+                        notifications.error('Vui lòng điền đầy đủ thông tin bắt buộc');
+                    }
+                    
+                    // Kiểm tra file ảnh nếu có
+                    const fileInput = document.getElementById('hinhAnh');
+                    if (fileInput.files.length > 0) {
+                        const file = fileInput.files[0];
+                        
+                        // Kiểm tra định dạng file
+                        const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+                        if (!validTypes.includes(file.type)) {
+                            event.preventDefault();
+                            fileInput.classList.add('is-invalid');
+                            notifications.error('Chỉ chấp nhận file ảnh định dạng JPG, JPEG, PNG');
+                            return;
+                        }
+                        
+                        // Kiểm tra kích thước file (max 5MB)
+                        const maxSize = 5 * 1024 * 1024; // 5MB
+                        if (file.size > maxSize) {
+                            event.preventDefault();
+                            fileInput.classList.add('is-invalid');
+                            notifications.error('Kích thước file vượt quá 5MB');
+                            return;
+                        }
+                        
+                        fileInput.classList.remove('is-invalid');
+                        fileInput.classList.add('is-valid');
+                    }
+                    
+                    form.classList.add('was-validated');
+                });
+                
+                // Xác thực từng trường khi thay đổi
+                const inputs = form.querySelectorAll('input, select');
+                inputs.forEach(input => {
+                    input.addEventListener('change', function() {
+                        if (!this.checkValidity()) {
+                            this.classList.add('is-invalid');
+                            this.classList.remove('is-valid');
+                        } else {
+                            this.classList.remove('is-invalid');
+                            this.classList.add('is-valid');
+                        }
+                    });
+                });
+            }
+        });

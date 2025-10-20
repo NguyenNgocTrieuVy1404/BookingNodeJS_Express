@@ -1,0 +1,101 @@
+extends ../layoutManager
+
+block content
+    .container-fluid.p-4
+        .d-flex.justify-content-between.align-items-center.mb-4
+            .d-flex.align-items-center
+                a.btn.btn-outline-secondary.me-3(href="/manager/hotels")
+                    i.fas.fa-arrow-left.me-1
+                    | Quay lại
+                h2.mb-0= hotel.tenKhachSan
+            span.badge.bg-primary Khu vực: #{hotel.tenDiaDiem}
+
+        .row.mb-4
+            .col-md-5
+                .card.shadow-sm.h-100
+                    .card-body
+                        if hotel.hinhAnh
+                            img.img-fluid.mb-3.rounded(src=`/uploads/hotels/${hotel.hinhAnh}` alt=hotel.tenKhachSan style="width: 100%; height: 240px; object-fit: cover;")
+                        else
+                            .hotel-placeholder.mb-3.bg-light.d-flex.justify-content-center.align-items-center.rounded(style="height: 240px;")
+                                i.fas.fa-hotel.fa-4x.text-muted
+                        
+                        h4.card-title.mb-3 Thông tin khách sạn
+                        
+                        ul.list-group.list-group-flush
+                            li.list-group-item.d-flex.justify-content-between.align-items-center
+                                span.text-muted ID Khách sạn:
+                                span.fw-medium= hotel.idKhachSan
+                            
+                            li.list-group-item.d-flex.justify-content-between.align-items-center
+                                span.text-muted Số sao:
+                                .rating
+                                    - for (let i = 0; i < hotel.soSao; i++)
+                                        i.fas.fa-star.text-warning
+                                    - for (let i = hotel.soSao; i < 5; i++)
+                                        i.far.fa-star.text-muted
+                            
+                            li.list-group-item.d-flex.justify-content-between.align-items-center
+                                span.text-muted Địa chỉ:
+                                span.fw-medium #{hotel.phuong}, #{hotel.quan}, #{hotel.thanhPho}
+                            
+                            if hotel.soDienThoai
+                                li.list-group-item.d-flex.justify-content-between.align-items-center
+                                    span.text-muted Số điện thoại:
+                                    span.fw-medium= hotel.soDienThoai
+                            
+                            if hotel.website
+                                li.list-group-item.d-flex.justify-content-between.align-items-center
+                                    span.text-muted Website:
+                                    a(href=hotel.website target="_blank")= hotel.website
+
+            .col-md-7
+                .card.shadow-sm
+                    .card-header.bg-white.py-3.d-flex.justify-content-between.align-items-center
+                        h5.card-title.mb-0
+                            i.fas.fa-door-open.me-2.text-primary
+                            | Danh sách phòng
+                        a.btn.btn-sm.btn-outline-success(href=`/manager/rooms/add?idKhachSan=${hotel.idKhachSan}`)
+                            i.fas.fa-plus.me-1
+                            | Thêm phòng mới
+
+                    .card-body
+                        .table-responsive
+                            table.table.table-hover.align-middle.mb-0
+                                thead.table-light
+                                    tr
+                                        th ID
+                                        th Loại phòng
+                                        th Giá phòng
+                                        th Trạng thái
+                                        th.text-end Thao tác
+                                tbody
+                                    if rooms && rooms.length
+                                        each room in rooms
+                                            tr
+                                                td= room.idPhong
+                                                td= room.tenLoaiPhong
+                                                td= room.giaPhong.toLocaleString('vi-VN') + ' đ'
+                                                td
+                                                    if room.trangThai === 1
+                                                        span.badge.bg-success Trống
+                                                    else if room.trangThai === 0
+                                                        span.badge.bg-danger Đã đặt
+                                                    else if room.trangThai === 2
+                                                        span.badge.bg-warning Đang bảo trì
+                                                    else
+                                                        span.badge.bg-secondary Không xác định
+                                                td.text-end
+                                                    a.btn.btn-sm.btn-outline-primary.me-1(href=`/manager/rooms/edit/${room.idPhong}` title="Sửa")
+                                                        i.fas.fa-edit
+                                                    a.btn.btn-sm.btn-outline-info.me-1(href=`/manager/rooms/${room.idPhong}/amenities` title="Tiện nghi")
+                                                        i.fas.fa-list
+                                    else
+                                        tr
+                                            td(colspan="5").text-center.py-4
+                                                .empty-state
+                                                    i.fas.fa-door-open.fa-3x.mb-3.text-muted
+                                                    p.mb-0 Chưa có phòng nào cho khách sạn này
+                                                    a.btn.btn-sm.btn-primary.mt-3(href=`/manager/rooms/add?idKhachSan=${hotel.idKhachSan}`)
+                                                        i.fas.fa-plus.me-1
+                                                        | Thêm phòng mới 

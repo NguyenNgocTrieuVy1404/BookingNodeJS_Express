@@ -1,0 +1,398 @@
+doctype html
+html
+  head
+    meta(charset="utf-8")
+    title Hóa đơn đặt phòng ##{booking.idDatPhong}
+    style.
+      @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+      
+      @page {
+        size: A4;
+        margin: 0;
+      }
+      
+      * {
+        box-sizing: border-box;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      
+      body {
+        font-family: 'Roboto', Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        color: #333;
+        background-color: #fff;
+        line-height: 1.6;
+      }
+      
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        position: relative;
+      }
+      
+      .watermark {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(-45deg);
+        font-size: 100px;
+        color: rgba(0, 0, 0, 0.03);
+        font-weight: bold;
+        z-index: 1;
+        pointer-events: none;
+      }
+      
+      .invoice-header {
+        background: linear-gradient(135deg, #1a237e, #283593);
+        padding: 30px;
+        color: white;
+        text-align: center;
+        position: relative;
+      }
+      
+      .invoice-logo {
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+      }
+      
+      .invoice-title {
+        font-size: 32px;
+        font-weight: 700;
+        margin-bottom: 5px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+      
+      .invoice-subtitle {
+        font-size: 16px;
+        opacity: 0.9;
+      }
+      
+      .invoice-body {
+        padding: 40px 30px;
+        position: relative;
+        z-index: 5;
+      }
+      
+      .header-info {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 30px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 20px;
+      }
+      
+      .invoice-info {
+        flex: 1;
+      }
+      
+      .invoice-id {
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #1a237e;
+        font-size: 18px;
+      }
+      
+      .invoice-date {
+        color: #666;
+        margin-bottom: 10px;
+      }
+      
+      .company-info {
+        flex: 1;
+        text-align: right;
+      }
+      
+      .company-name {
+        font-weight: bold;
+        font-size: 18px;
+        color: #1a237e;
+        margin-bottom: 5px;
+      }
+      
+      .company-address {
+        color: #666;
+        font-size: 14px;
+      }
+      
+      .hotel-info {
+        background: rgba(26, 35, 126, 0.05);
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 25px;
+        border-left: 5px solid #1a237e;
+      }
+      
+      .hotel-name {
+        font-size: 22px;
+        color: #1a237e;
+        margin-bottom: 10px;
+        font-weight: 500;
+      }
+      
+      .detail-section {
+        margin-bottom: 30px;
+      }
+      
+      .section-title {
+        color: #1a237e;
+        font-size: 20px;
+        margin-bottom: 15px;
+        padding-bottom: 5px;
+        border-bottom: 2px solid #e0e0e0;
+        font-weight: 500;
+      }
+      
+      .detail-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+      }
+      
+      .detail-table th {
+        text-align: left;
+        padding: 12px 8px;
+        background-color: #f5f5f5;
+        border: 1px solid #ddd;
+        font-weight: 500;
+      }
+      
+      .detail-table td {
+        padding: 12px 8px;
+        border: 1px solid #ddd;
+      }
+      
+      .price-summary {
+        background: #f9f9f9;
+        padding: 20px;
+        border-radius: 8px;
+        margin-top: 25px;
+        border: 1px solid #eee;
+      }
+      
+      .price-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      
+      .price-table td {
+        padding: 8px 0;
+      }
+      
+      .price-table td:last-child {
+        text-align: right;
+        font-weight: 500;
+      }
+      
+      .price-table tr.total-row {
+        border-top: 2px solid #ddd;
+        font-weight: 700;
+        font-size: 18px;
+        color: #1a237e;
+      }
+      
+      .price-table tr.total-row td {
+        padding-top: 15px;
+      }
+      
+      .qr-container {
+        text-align: center;
+        margin: 40px 0;
+        padding: 30px;
+        background: #f9f9f9;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      }
+      
+      .qr-title {
+        margin-bottom: 20px;
+        color: #1a237e;
+        font-weight: 600;
+        font-size: 18px;
+      }
+      
+      .qr-image {
+        max-width: 250px;
+        border: 15px solid white;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+      }
+      
+      .footer {
+        margin-top: 40px;
+        text-align: center;
+        color: #777;
+        font-size: 14px;
+        padding: 20px;
+        background: #f9f9f9;
+        border-radius: 8px;
+        border-top: 1px solid #eee;
+      }
+      
+      .stamp-signature {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 40px;
+        text-align: center;
+      }
+      
+      .stamp, .signature {
+        flex: 1;
+      }
+      
+      .stamp-title, .signature-title {
+        font-weight: 500;
+        margin-bottom: 60px;
+      }
+      
+      .stamp-content {
+        border: 2px solid #1a237e;
+        display: inline-block;
+        padding: 15px;
+        border-radius: 5px;
+        color: #1a237e;
+        font-weight: 500;
+        background-color: rgba(26, 35, 126, 0.05);
+      }
+      
+      .signature-line {
+        display: inline-block;
+        width: 200px;
+        border-bottom: 1px solid #666;
+        margin-bottom: 10px;
+      }
+      
+      .signature-name {
+        font-weight: 500;
+      }
+      
+      .thank-you {
+        font-size: 18px;
+        font-weight: 500;
+        color: #1a237e;
+        margin-bottom: 10px;
+      }
+      
+      .contact-info {
+        margin-top: 10px;
+      }
+      
+      @media print {
+        body {
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+        
+        .invoice-header {
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+          background-color: #1a237e !important;
+        }
+        
+        .watermark {
+          display: block !important;
+        }
+      }
+
+  body
+    .container
+      .watermark HOTEL BOOKING
+      .invoice-header
+        .invoice-logo HOTEL BOOKING
+        .invoice-title HÓA ĐƠN ĐẶT PHÒNG
+        .invoice-subtitle Mã đặt phòng: ##{booking.idDatPhong}
+      
+      .invoice-body
+        .header-info
+          .invoice-info
+            .invoice-id Mã hóa đơn: ##{booking.idDatPhong}
+            .invoice-date Ngày lập: #{formatDate(new Date())}
+          
+          .company-info
+            .company-name HOTEL BOOKING SYSTEM
+            .company-address
+              div 123 Đường ABC, Quận XYZ
+              div TP. Hồ Chí Minh, Việt Nam
+              div Email: support@hotelbooking.com
+        
+        .hotel-info
+          .hotel-name= booking.tenKhachSan
+          div
+            strong Địa chỉ: 
+            | #{booking.diaChi}
+        
+        .detail-section
+          .section-title Thông tin khách hàng
+          table.detail-table
+            tr
+              th(width="40%") Thông tin
+              th(width="60%") Chi tiết
+            tr
+              td Họ tên
+              td= booking.hoTen
+            tr
+              td Email
+              td= booking.email
+            tr
+              td Số điện thoại
+              td= booking.soDienThoai || 'Chưa cung cấp'
+        
+        .detail-section
+          .section-title Thông tin đặt phòng
+          table.detail-table
+            tr
+              th(width="40%") Thông tin
+              th(width="60%") Chi tiết
+            tr
+              td Phòng
+              td #{booking.idPhong} - #{booking.loaiPhong}
+            tr
+              td Ngày nhận phòng
+              td= formatDate(booking.ngayBatDau)
+            tr
+              td Ngày trả phòng
+              td= formatDate(booking.ngayKetThuc)
+            tr
+              td Số đêm
+              td #{nights} đêm
+        
+        .price-summary
+          table.price-table
+            tr
+              td Giá phòng mỗi đêm
+              td= formatCurrency(booking.donGia)
+            tr
+              td Số đêm
+              td #{nights} đêm
+            tr
+              td Thuế và phí dịch vụ
+              td Đã bao gồm
+            tr.total-row
+              td Tổng tiền
+              td= formatCurrency(booking.thanhTien || (booking.donGia * nights))
+        
+        .qr-container
+          .qr-title Quét mã QR này khi bạn đến nhận phòng
+          img.qr-image(src=qrCodeURL, alt="Mã QR xác nhận đặt phòng")
+        
+        .stamp-signature
+          .stamp
+            .stamp-title Đóng dấu
+            .stamp-content HOTEL BOOKING
+          .signature
+            .signature-title Người đặt phòng
+            .signature-line
+            .signature-name= booking.hoTen
+        
+        .footer
+          .thank-you Cảm ơn quý khách đã sử dụng dịch vụ của chúng tôi
+          p Đây là hóa đơn điện tử được tạo tự động.
+          
+          .contact-info
+            div Thông tin liên hệ: 0123 456 789 | support@hotelbooking.com
+            div © #{new Date().getFullYear()} Hotel Booking System 

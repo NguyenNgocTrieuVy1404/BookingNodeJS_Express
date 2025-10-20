@@ -1,0 +1,441 @@
+extends layouts/layout
+
+block content
+  style.
+    .booking-container {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    }
+
+    .booking-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .booking-title {
+      font-size: 2.5rem;
+      color: #2c3e50;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #2c3e50, #3498db);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .room-info {
+      background: linear-gradient(135deg, #00b4db, #0083b0);
+      padding: 1.5rem;
+      border-radius: 15px;
+      color: white;
+      margin-bottom: 2rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.8rem;
+      border: 1px solid rgba(0,0,0,0.1);
+      border-radius: 10px;
+      background: rgba(255,255,255,0.9);
+      transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: #00b4db;
+      box-shadow: 0 0 0 2px rgba(0,180,219,0.2);
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 1rem;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(45deg, #00b4db, #0083b0);
+      color: white;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,179,219,0.4);
+    }
+
+    .price-calculation {
+      background: rgba(255,255,255,0.9);
+      padding: 1.5rem;
+      border-radius: 15px;
+      margin-top: 2rem;
+    }
+
+    .price-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+    }
+
+    .total-price {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #2c3e50;
+      border-top: 2px solid rgba(0,0,0,0.1);
+      padding-top: 1rem;
+      margin-top: 1rem;
+    }
+
+    .notification-container {
+      animation: slideIn 0.5s ease-out;
+    }
+
+    .alert {
+      padding: 1rem 1.5rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      margin-bottom: 1rem;
+    }
+
+    .alert-success {
+      background: linear-gradient(45deg, #48bb78, #38a169);
+      color: white;
+      border: none;
+    }
+
+    .alert-danger {
+      background: linear-gradient(45deg, #fc8181, #f56565);
+      color: white;
+      border: none;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    .btn-submit:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    // Thêm style cho validate
+    .form-control.is-invalid {
+      border-color: #dc3545;
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right calc(0.375em + 0.1875rem) center;
+      background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+    }
+
+    .invalid-feedback {
+      display: none;
+      color: #dc3545;
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+    }
+
+    .form-control.is-invalid + .invalid-feedback {
+      display: block;
+    }
+
+    .booked-dates {
+      background: #fff3cd;
+      padding: 1rem;
+      border-radius: 10px;
+      margin-top: 1rem;
+    }
+
+    .booking-list {
+      list-style: none;
+      padding-left: 1.5rem;
+      margin: 0.5rem 0;
+      font-size: 0.9rem;
+      color: #856404;
+    }
+
+  .booking-container
+    .booking-header
+      h1.booking-title
+        i.fas.fa-calendar-check.me-2
+        | Đặt Phòng
+    
+    if room
+      .room-info
+        h3.mb-3
+          i.fas.fa-hotel.me-2
+          = room.tenKhachSan
+        p.mb-2
+          i.fas.fa-door-closed.me-2
+          | Số phòng: #{room.idPhong}
+        p.mb-2
+          i.fas.fa-bed.me-2
+          | Loại phòng: #{room.loaiPhong}
+        p.mb-0
+          i.fas.fa-money-bill-wave.me-2
+          | Giá phòng: #{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(room.giaPhong)}
+
+        if room.bookings && room.bookings.length > 0
+          .booked-dates.mt-3
+            p.text-warning.mb-2
+              i.fas.fa-exclamation-triangle.me-2
+              | Phòng đã được đặt trong các ngày:
+            ul.booking-list
+              each booking in room.bookings
+                li= `${new Date(booking.ngayBatDau).toLocaleDateString('vi-VN')} - ${new Date(booking.ngayKetThuc).toLocaleDateString('vi-VN')}`
+
+        if existingBookings && existingBookings.length > 0
+          .alert.alert-warning.mt-3
+            i.fas.fa-exclamation-triangle.me-2
+            | Phòng đã được đặt trong các ngày:
+            ul.list-unstyled.mt-2
+              each booking in existingBookings
+                li
+                  i.fas.fa-calendar-alt.me-2
+                  | #{new Date(booking.ngayBatDau).toLocaleDateString('vi-VN')} - #{new Date(booking.ngayKetThuc).toLocaleDateString('vi-VN')}
+
+    // Thêm div để hiển thị thông báo
+    .notification-container#notificationContainer(style="display: none; position: fixed; top: 20px; right: 20px; z-index: 1000;")
+      .alert(role="alert")
+
+    form#bookingForm(action="/bookings" method="POST" novalidate)
+      input(type="hidden" name="idPhong" value=room.idPhong)
+      
+      .form-group
+        label.form-label(for="ngayBatDau") Ngày nhận phòng
+        input#ngayBatDau.form-control(
+          type="date"
+          name="ngayBatDau"
+          required
+          min=new Date().toISOString().split('T')[0]
+        )
+        .invalid-feedback Vui lòng chọn ngày nhận phòng
+
+      .form-group
+        label.form-label(for="ngayKetThuc") Ngày trả phòng  
+        input#ngayKetThuc.form-control(
+          type="date"
+          name="ngayKetThuc"
+          required
+        )
+        .invalid-feedback Vui lòng chọn ngày trả phòng hợp lệ
+
+      .price-calculation
+        .price-row
+          span Giá phòng mỗi đêm:
+          span#roomPrice= new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(room.giaPhong)
+        .price-row
+          span Số đêm:
+          span#numberOfNights 0
+        .price-row.total-price
+          span Tổng tiền:
+          span#totalPrice 0 ₫
+
+      button.btn-submit(type="submit")
+        i.fas.fa-check.me-2
+        span#submitText Xác nhận đặt phòng
+        span#submitLoading.spinner-border.spinner-border-sm.ms-2(style="display: none")
+
+  script.
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('bookingForm');
+      const startDate = document.getElementById('ngayBatDau');
+      const endDate = document.getElementById('ngayKetThuc');
+      const roomPrice = parseFloat('#{room.giaPhong}');
+
+      // Thêm biến lưu bookings
+      const bookings = !{JSON.stringify(room.bookings || [])};
+
+      // Lấy danh sách booking từ server
+      const existingBookings = !{JSON.stringify(existingBookings || [])};
+
+      function showNotification(message, type) {
+        const container = document.getElementById('notificationContainer');
+        const alert = container.querySelector('.alert');
+        alert.className = `alert alert-${type}`;
+        alert.innerHTML = `
+          <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} me-2"></i>
+          ${message}
+        `;
+        container.style.display = 'block';
+        
+        setTimeout(() => {
+          container.style.display = 'none';
+        }, 5000);
+      }
+
+      function checkDateOverlap(start, end) {
+        const newStart = new Date(start);
+        const newEnd = new Date(end);
+
+        return existingBookings.some(booking => {
+          const bookStart = new Date(booking.ngayBatDau);
+          const bookEnd = new Date(booking.ngayKetThuc);
+          
+          return (newStart < bookEnd && newEnd > bookStart);
+        });
+      }
+
+      function validateDates() {
+        const start = new Date(startDate.value);
+        const end = new Date(endDate.value);
+        const today = new Date();
+        today.setHours(0,0,0,0);
+
+        startDate.classList.remove('is-invalid');
+        endDate.classList.remove('is-invalid');
+
+        if (!startDate.value) {
+          startDate.classList.add('is-invalid');
+          startDate.nextElementSibling.textContent = 'Vui lòng chọn ngày nhận phòng';
+          return false;
+        }
+
+        if (start < today) {
+          startDate.classList.add('is-invalid');
+          startDate.nextElementSibling.textContent = 'Ngày nhận phòng không thể là ngày trong quá khứ';
+          return false;
+        }
+
+        if (!endDate.value) {
+          endDate.classList.add('is-invalid');
+          endDate.nextElementSibling.textContent = 'Vui lòng chọn ngày trả phòng';
+          return false;
+        }
+
+        if (end <= start) {
+          endDate.classList.add('is-invalid');
+          endDate.nextElementSibling.textContent = 'Ngày trả phòng phải sau ngày nhận phòng';
+          return false;
+        }
+
+        // Kiểm tra trùng lịch
+        if (checkDateOverlap(start, end)) {
+          startDate.classList.add('is-invalid');
+          endDate.classList.add('is-invalid');
+          startDate.nextElementSibling.textContent = 'Phòng đã được đặt trong khoảng thời gian này';
+          endDate.nextElementSibling.textContent = 'Phòng đã được đặt trong khoảng thời gian này';
+          return false;
+        }
+
+        return true;
+      }
+
+      function updatePrice() {
+        if (startDate.value && endDate.value) {
+          const start = new Date(startDate.value);
+          const end = new Date(endDate.value);
+          const nights = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+          
+          if (nights > 0) {
+            document.getElementById('numberOfNights').textContent = nights;
+            const total = nights * roomPrice;
+            document.getElementById('totalPrice').textContent = 
+              new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(total);
+          }
+        }
+      }
+
+      // Thêm sự kiện validate khi thay đổi ngày
+      startDate.addEventListener('change', function() {
+        validateDates();
+        updatePrice();
+      });
+      endDate.addEventListener('change', function() {
+        validateDates();
+        updatePrice();
+      });
+
+      // Thêm thực hiện tính toán giá ngay khi trang load
+      if (startDate.value && endDate.value) {
+        updatePrice();
+      }
+
+      // Xử lý submit form
+      form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        if (!validateDates()) {
+          return;
+        }
+
+        const submitBtn = form.querySelector('.btn-submit');
+        const submitText = document.getElementById('submitText');
+        const submitLoading = document.getElementById('submitLoading');
+
+        try {
+          submitBtn.disabled = true;
+          submitText.textContent = 'Đang xử lý...';
+          submitLoading.style.display = 'inline-block';
+
+          const formData = new FormData(this);
+          const response = await fetch('/bookings', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(Object.fromEntries(formData))
+          });
+
+          const result = await response.json();
+
+          if (response.ok) {
+            showNotification('Đặt phòng thành công! Đang chuyển hướng...', 'success');
+            
+            // Chuyển hướng đến trang booking-success nếu có
+            if (result.redirectUrl) {
+              setTimeout(() => {
+                window.location.href = result.redirectUrl;
+              }, 1500);
+            } else {
+              setTimeout(() => {
+                window.location.href = '/bookings';
+              }, 1500);
+            }
+          } else {
+            // Xử lý khi phòng đã được đặt
+            showNotification(result.message, 'danger');
+            
+            // Highlight date inputs
+            startDate.classList.add('is-invalid');
+            endDate.classList.add('is-invalid');
+            
+            // Cập nhật thông báo lỗi
+            startDate.nextElementSibling.textContent = 'Vui lòng chọn ngày khác';
+            endDate.nextElementSibling.textContent = 'Vui lòng chọn ngày khác';
+            
+            // Focus vào input đầu tiên
+            startDate.focus();
+          }
+
+        } catch (error) {
+          showNotification('Có lỗi xảy ra khi đặt phòng', 'danger');
+        } finally {
+          submitBtn.disabled = false;
+          submitText.textContent = 'Xác nhận đặt phòng';
+          submitLoading.style.display = 'none';
+        }
+      });
+    }); 

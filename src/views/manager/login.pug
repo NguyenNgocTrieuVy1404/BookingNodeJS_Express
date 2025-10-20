@@ -1,0 +1,82 @@
+extends ../layoutManager
+
+block content
+    .container
+        .row.justify-content-center.align-items-center.min-vh-100
+            .col-md-6.col-lg-5
+                .card.shadow-lg.border-0
+                    .card-body.p-5
+                        .text-center.mb-4
+                            i.fas.fa-user-tie.fa-3x.text-primary.mb-3
+                            h2.card-title.mb-4 Đăng nhập Quản lý
+                            
+                        if error
+                            .alert.alert-danger.d-flex.align-items-center
+                                i.fas.fa-exclamation-circle.me-2
+                                = error
+
+                        form(method="POST" action="/manager/login")
+                            .form-group.mb-4
+                                label.form-label.fw-medium(for="tenDangNhap") 
+                                    i.fas.fa-user.me-2
+                                    | Tên đăng nhập
+                                .input-group
+                                    input#tenDangNhap.form-control.form-control-lg(
+                                        type="text" 
+                                        name="tenDangNhap" 
+                                        value=lastUsername 
+                                        required
+                                        placeholder="Nhập tên đăng nhập"
+                                    )
+
+                            .form-group.mb-4
+                                label.form-label.fw-medium(for="matKhau")
+                                    i.fas.fa-lock.me-2
+                                    | Mật khẩu
+                                .input-group
+                                    input#matKhau.form-control.form-control-lg(
+                                        type="password" 
+                                        name="matKhau" 
+                                        required
+                                        placeholder="Nhập mật khẩu"
+                                    )
+                                    button.btn.btn-outline-secondary#togglePassword(
+                                        type="button"
+                                        tabindex="-1"
+                                    )
+                                        i.fas.fa-eye
+
+                            button.btn.btn-primary.btn-lg.w-100.mb-3(type="submit")
+                                i.fas.fa-sign-in-alt.me-2
+                                | Đăng nhập
+
+                            .text-center.text-muted
+                                small Chỉ dành cho quản lý khách sạn
+
+block scripts
+    script.
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const matKhauInput = document.getElementById('matKhau');
+            const icon = this.querySelector('i');
+            
+            if (matKhauInput.type === 'password') {
+                matKhauInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                matKhauInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+
+        // Xử lý form submit
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const tenDangNhap = document.getElementById('tenDangNhap').value.trim();
+            const matKhau = document.getElementById('matKhau').value.trim();
+            
+            if (!tenDangNhap || !matKhau) {
+                e.preventDefault();
+                alert('Vui lòng điền đầy đủ thông tin!');
+            }
+        });

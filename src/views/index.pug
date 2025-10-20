@@ -1,0 +1,67 @@
+extends layouts/layout
+
+block content
+  .row
+    .col-12.mb-4
+      h1.text-center.display-4 Tìm và đặt khách sạn
+      p.text-center.lead Khám phá các khách sạn tuyệt vời với giá tốt nhất
+
+    .col-12.mb-5
+      .card.shadow-sm
+        .card-body
+          form.row.g-3(action='/search' method='GET')
+            .col-md-4
+              label.form-label(for='location') Địa điểm
+              select#location.form-select(name='location')
+                option(value='') Chọn địa điểm
+                each location in locations || []
+                  option(value=location.idDiaDiem)= location.tenDiaDiem
+
+            .col-md-3
+              label.form-label(for='checkIn') Ngày nhận phòng
+              input#checkIn.form-control(type='date' name='checkIn')
+
+            .col-md-3
+              label.form-label(for='checkOut') Ngày trả phòng
+              input#checkOut.form-control(type='date' name='checkOut')
+
+            .col-md-2.d-flex.align-items-end
+              button.btn.btn-primary.w-100(type='submit')
+                i.fas.fa-search.me-2
+                | Tìm kiếm
+
+    .col-12
+      h2.mb-4 Khách sạn nổi bật
+
+    each hotel in hotels || []
+      .col-md-4.mb-4
+        .card.shadow-sm.h-100
+          .card-body
+            h5.card-title= hotel.tenKhachSan
+            p.card-text.text-muted
+              i.fas.fa-map-marker-alt.me-2
+              | #{hotel.diaChi}, #{hotel.tenDiaDiem}
+            if hotel.giaPhong
+              p.card-text
+                span.text-primary.fw-bold Từ #{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(hotel.giaPhong)}
+                |  / đêm
+            a.btn.btn-outline-primary.mt-3(href=`/hotels/${hotel.idKhachSan}`)
+              | Xem chi tiết 
+              i.fas.fa-arrow-right.ms-2
+    else
+      .col-12
+        .alert.alert-info.text-center
+          i.fas.fa-info-circle.me-2
+          | Không có khách sạn nào
+
+block scripts
+  script.
+    // Thiết lập ngày tối thiểu cho input date là ngày hiện tại
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('checkIn').min = today;
+    document.getElementById('checkOut').min = today;
+
+    // Cập nhật ngày checkout tối thiểu khi chọn ngày checkin
+    document.getElementById('checkIn').addEventListener('change', function() {
+      document.getElementById('checkOut').min = this.value;
+    });

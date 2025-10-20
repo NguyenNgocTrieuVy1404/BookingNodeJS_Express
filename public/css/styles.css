@@ -1,0 +1,63 @@
+/* Validation styles */
+.error-message {
+    color: #dc3545;
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+    display: block;
+    animation: fadeIn 0.3s;
+    clear: both;
+    width: 100%;
+    position: relative;
+    padding-left: 20px;
+}
+
+.error-message i {
+    position: absolute;
+    left: 0;
+    top: 2px;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.is-invalid {
+    border-color: #dc3545 !important;
+    background-image: none !important;
+    transition: border-color 0.15s ease-in-out;
+}
+
+.is-invalid:focus {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25) !important;
+}
+
+/* Form styles */
+.form-control {
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-control:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25);
+}
+
+.input-group {
+    margin-bottom: 0.5rem;
+}
+
+.input-group .input-icon {
+    z-index: 5;
+}
+
+/* Responsive form styles */
+@media (max-width: 768px) {
+    .auth-container {
+        padding: 20px 10px;
+    }
+    
+    .card-body {
+        padding: 20px;
+    }
+} 

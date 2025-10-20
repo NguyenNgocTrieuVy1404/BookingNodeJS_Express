@@ -1,0 +1,122 @@
+doctype html
+html(lang="vi")
+    head
+        title= title || 'Manager Panel'
+        meta(charset="UTF-8")
+        meta(name="viewport" content="width=device-width, initial-scale=1.0")
+        link(rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css")
+        link(rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css")
+        style.
+            :root {
+                --primary-color: #0891b2;
+                --secondary-color: #0e7490;
+                --dark-color: #1f2937;
+                --light-color: #f3f4f6;
+            }
+
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background-color: var(--light-color);
+            }
+
+            .manager-container {
+                display: flex;
+                min-height: 100vh;
+            }
+
+            .sidebar {
+                width: 280px;
+                background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
+                color: white;
+                padding: 1.5rem;
+                position: fixed;
+                height: 100vh;
+                box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+            }
+
+            .sidebar h2 {
+                font-size: 1.5rem;
+                font-weight: 600;
+                margin-bottom: 2rem;
+                padding-bottom: 1rem;
+                border-bottom: 1px solid rgba(255,255,255,0.1);
+            }
+
+            .sidebar nav {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .sidebar a {
+                color: rgba(255,255,255,0.8);
+                text-decoration: none;
+                padding: 0.75rem 1rem;
+                border-radius: 8px;
+                transition: all 0.3s ease;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .sidebar a:hover {
+                background: rgba(255,255,255,0.1);
+                color: white;
+                transform: translateX(5px);
+            }
+
+            .sidebar a i {
+                width: 20px;
+            }
+
+            .main-content {
+                flex: 1;
+                margin-left: 280px;
+                padding: 2rem;
+            }
+
+    body
+        .manager-container
+            .sidebar
+                h2 
+                    i.fas.fa-user-tie.me-2
+                    | Manager Panel
+                    if locals.user && locals.user.tenDiaDiem
+                        small.d-block.mt-2.text-light Khu vực: #{locals.user.tenDiaDiem}
+                nav
+                    a(href="http://localhost:3000/")
+                        i.fas.fa-home
+                        | Trang chủ
+                    a(href="/manager/dashboard")
+                        i.fas.fa-chart-line
+                        | Dashboard
+                    a(href="/manager/rooms")
+                        i.fas.fa-door-open
+                        | Quản lý Phòng
+                    a(href="/manager/bookings")
+                        i.fas.fa-calendar-check
+                        | Quản lý Đặt phòng
+                    a(href="/manager/amenities")
+                        i.fas.fa-concierge-bell
+                        | Quản lý Tiện nghi
+                    if locals.manager || locals.user
+                        a(href="#" onclick="handleLogout()")
+                            i.fas.fa-sign-out-alt
+                            | Đăng xuất
+            .main-content
+                block content
+
+        script(src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js")
+        script.
+            function handleLogout() {
+                if (confirm('Bạn có chắc muốn đăng xuất?')){
+                    fetch('/manager/logout', {
+                        method: 'POST',
+                        credentials: 'include'
+                    }).then(() => {
+                        window.location.href = '/manager/login';
+                    });
+                }
+            }
+
+        block scripts

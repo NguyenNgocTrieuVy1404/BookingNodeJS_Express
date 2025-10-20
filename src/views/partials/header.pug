@@ -1,0 +1,255 @@
+style.
+  .navbar {
+    background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+    padding: 1rem 0;
+    transition: all 0.3s ease;
+  }
+
+  .navbar-brand {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff !important;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+  }
+
+  .navbar-brand:hover {
+    transform: translateY(-2px);
+    text-shadow: 0 2px 10px rgba(255, 255, 255, 0.3);
+  }
+
+  .nav-link {
+    color: rgba(255, 255, 255, 0.9) !important;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    margin: 0 0.2rem;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+  }
+
+  .nav-link:hover {
+    color: #fff !important;
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+  }
+
+  .logout-link:hover {
+    color: #fff !important;
+    background: rgba(255, 0, 0, 0.7) !important;
+    transform: translateY(-2px);
+  }
+
+  .navbar-toggler {
+    border: none;
+    padding: 0.5rem;
+  }
+
+  .navbar-toggler:focus {
+    box-shadow: none;
+  }
+
+  .navbar-toggler-icon {
+    width: 1.5em;
+    height: 1.5em;
+  }
+
+  @media (max-width: 768px) {
+    .navbar-collapse {
+      background: rgba(0, 0, 0, 0.95);
+      padding: 1rem;
+      border-radius: 10px;
+      margin-top: 1rem;
+    }
+  }
+
+  .nav-item {
+    opacity: 0;
+    transform: translateY(-10px);
+    animation: fadeInDown 0.5s forwards;
+  }
+
+  @keyframes fadeInDown {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .nav-item:nth-child(1) { animation-delay: 0.1s; }
+  .nav-item:nth-child(2) { animation-delay: 0.2s; }
+  .nav-item:nth-child(3) { animation-delay: 0.3s; }
+  .nav-item:nth-child(4) { animation-delay: 0.4s; }
+  .nav-item:nth-child(5) { animation-delay: 0.5s; }
+  .nav-item:nth-child(6) { animation-delay: 0.6s; }
+
+  .user-info {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 25px;
+    margin-right: 1rem;
+  }
+
+  .user-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .role-badge {
+    margin-left: 8px;
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .role-badge.admin {
+    background: rgba(220, 53, 69, 0.8);
+  }
+  
+  .role-badge.manager {
+    background: rgba(13, 110, 253, 0.8);
+  }
+  
+  .role-badge.user {
+    background: rgba(25, 135, 84, 0.8);
+  }
+  
+  .dropdown-menu {
+    background: rgba(33, 37, 41, 0.9);
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  }
+  
+  .dropdown-item {
+    color: rgba(255, 255, 255, 0.9);
+    padding: 0.6rem 1.5rem;
+    transition: all 0.2s ease;
+  }
+  
+  .dropdown-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    transform: translateX(5px);
+  }
+  
+  .dropdown-divider {
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+nav.navbar.navbar-expand-lg.navbar-dark
+  .container
+    a.navbar-brand(href='/')
+      i.fas.fa-hotel.me-2
+      | Hotel Booking
+    button.navbar-toggler(type='button' data-bs-toggle='collapse' data-bs-target='#navbarNav')
+      span.navbar-toggler-icon
+    #navbarNav.collapse.navbar-collapse
+      ul.navbar-nav.me-auto
+        li.nav-item
+          a.nav-link(href='/about')
+            i.fas.fa-info-circle.me-1
+            | Về chúng tôi
+        li.nav-item
+          a.nav-link(href='/contact')
+            i.fas.fa-envelope.me-1
+            | Liên hệ
+        li.nav-item
+          a.nav-link(href='/privacy')
+            i.fas.fa-shield-alt.me-1
+            | Chính sách
+      ul.navbar-nav.ms-auto
+        if user && user.isLoggedIn
+          if user.quyenHan === 'admin'
+            li.nav-item.dropdown
+              .user-info.dropdown-toggle#userDropdown(data-bs-toggle="dropdown" aria-expanded="false")
+                .user-avatar
+                  i.fas.fa-user
+                span.text-white #{user.fullName || user.username || user.hoTen}
+                span.role-badge.admin admin
+              ul.dropdown-menu.dropdown-menu-end(aria-labelledby="userDropdown")
+                li
+                  a.dropdown-item(href='/admin/dashboard')
+                    i.fas.fa-chart-line.me-2
+                    | Admin Dashboard
+                li
+                  a.dropdown-item(href='/admin/users')
+                    i.fas.fa-users.me-2
+                    | Quản lý Users
+                li
+                  a.dropdown-item(href='/admin/hotels')
+                    i.fas.fa-hotel.me-2
+                    | Quản lý Hotels
+                li
+                  a.dropdown-item(href='/admin/bookings')
+                    i.fas.fa-calendar-check.me-2
+                    | Quản lý Bookings
+                li.dropdown-divider
+                li
+                  a.dropdown-item.text-danger(href='/users/logout' onclick='return confirm("Bạn có chắc chắn muốn đăng xuất?")')
+                    i.fas.fa-sign-out-alt.me-2
+                    | Đăng xuất
+          else if user.quyenHan === 'manager'
+            li.nav-item.dropdown
+              .user-info.dropdown-toggle#userDropdown(data-bs-toggle="dropdown" aria-expanded="false")
+                .user-avatar
+                  i.fas.fa-user
+                span.text-white #{user.fullName || user.username || user.hoTen}
+                span.role-badge.manager manager
+              ul.dropdown-menu.dropdown-menu-end(aria-labelledby="userDropdown")
+                li
+                  a.dropdown-item(href='/manager/dashboard')
+                    i.fas.fa-chart-line.me-2
+                    | Manager Dashboard
+                li
+                  a.dropdown-item(href='/manager/rooms')
+                    i.fas.fa-door-open.me-2
+                    | Quản lý Phòng
+                li
+                  a.dropdown-item(href='/manager/bookings')
+                    i.fas.fa-calendar-check.me-2
+                    | Quản lý Đặt phòng
+                li
+                  a.dropdown-item(href='/manager/amenities')
+                    i.fas.fa-concierge-bell.me-2
+                    | Quản lý Tiện nghi
+                li.dropdown-divider
+                li
+                  a.dropdown-item.text-danger(href='/users/logout' onclick='return confirm("Bạn có chắc chắn muốn đăng xuất?")')
+                    i.fas.fa-sign-out-alt.me-2
+                    | Đăng xuất
+          else
+            li.nav-item
+              .user-info
+                .user-avatar
+                  i.fas.fa-user
+                a.text-white(href='/profile') #{user.fullName || user.hoTen}
+            li.nav-item
+              a.nav-link(href='/bookings-detail')
+                i.fas.fa-bookmark.me-1
+                | Đặt phòng của tôi
+            li.nav-item
+              a.nav-link.logout-link(href='/users/logout' onclick='return confirm("Bạn có chắc chắn muốn đăng xuất?")')
+                i.fas.fa-sign-out-alt.me-1
+                | Đăng xuất
+        else
+          li.nav-item
+            a.nav-link(href='/users/login')
+              i.fas.fa-sign-in-alt.me-1
+              | Đăng nhập
+          li.nav-item
+            a.nav-link(href='/users/register')
+              i.fas.fa-user-plus.me-1
+              | Đăng ký

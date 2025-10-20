@@ -1,0 +1,121 @@
+:root {
+  --gradient-start: #1a1a1a;
+  --gradient-end: #4a4a4a;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #f8f9fa;
+  padding-top: 76px; 
+}
+
+main {
+  flex: 1;
+}
+
+.navbar, footer {
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+}
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1030;
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+  padding: 1rem 0;
+  transition: all 0.3s ease;
+}
+
+.navbar-brand {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fff !important;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+}
+
+.navbar-brand:hover {
+  transform: translateY(-2px);
+  text-shadow: 0 2px 10px rgba(255, 255, 255, 0.3);
+}
+
+.nav-link {
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  margin: 0 0.2rem;
+  border-radius: 5px;
+  transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+  color: #fff !important;
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+footer {
+  color: #fff;
+  padding: 3rem 0;
+  margin-top: 5rem;
+}
+
+footer p {
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+footer a {
+  color: rgba(255, 255, 255, 0.8) !important;
+  text-decoration: none;
+  margin: 0 1rem;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+footer a:hover {
+  color: #fff !important;
+}
+
+footer a::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -5px;
+  left: 0;
+  background-color: #fff;
+  transition: width 0.3s ease;
+}
+
+footer a:hover::after {
+  width: 100%;
+}
+
+.navbar-toggler {
+  border: none;
+  padding: 0.5rem;
+}
+
+.navbar-toggler:focus {
+  box-shadow: none;
+}
+
+.navbar-toggler-icon {
+  width: 1.5em;
+  height: 1.5em;
+}
+
+@media (max-width: 768px) {
+  .navbar-collapse {
+    background: rgba(0, 0, 0, 0.95);
+    padding: 1rem;
+    border-radius: 10px;
+    margin-top: 1rem;
+  }
+}

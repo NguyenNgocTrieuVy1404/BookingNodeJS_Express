@@ -1,0 +1,469 @@
+extends ../layoutAdmin
+
+block content
+    - 
+        function formatDateInput(dateString) {
+            const date = new Date(dateString);
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+    // Container cho thông báo
+    #notificationContainer.position-fixed.top-0.end-0.p-3(style="z-index: 1060; max-width: 380px;")
+        // Thông báo sẽ được thêm vào đây bằng JavaScript
+
+    .container-fluid.p-4
+        // Các alert cũ (để duy trì tương thích)
+        if cookies.adminMessage
+            .alert.alert-success.alert-dismissible.fade.show(role='alert')
+                = cookies.adminMessage
+                button.btn-close(type='button' data-bs-dismiss='alert' aria-label='Close')
+
+        if cookies.adminError
+            .alert.alert-danger.alert-dismissible.fade.show(role='alert')
+                = cookies.adminError
+                button.btn-close(type='button' data-bs-dismiss='alert' aria-label='Close')
+
+        .card.shadow-sm
+            .card-header.bg-white.py-3
+                h5.card-title.mb-0
+                    i.fas.fa-calendar-alt.me-2.text-primary
+                    | Chỉnh sửa đặt phòng
+
+            .card-body
+                form#editBookingForm.admin-form(action=`/admin/bookings/edit/${booking.idDatPhong}` method="POST")
+                    .row
+                        .col-md-6.mb-3
+                            label.form-label(for="idKhachHang") Khách hàng
+                            select.form-select#idKhachHang(name="idKhachHang")
+                                each customer in customers
+                                    option(value=customer.idKhachHang selected=customer.idKhachHang === booking.idKhachHang)= customer.hoTen
+
+                        .col-md-6.mb-3
+                            label.form-label(for="idPhong") Phòng
+                            select.form-select#idPhong(name="idPhong")
+                                each room in rooms
+                                    option(value=room.idPhong selected=room.idPhong === booking.idPhong)= `Phòng ${room.idPhong} - ${room.tenKhachSan}`
+
+                        .col-md-6.mb-3
+                            label.form-label(for="ngayBatDau") Ngày bắt đầu
+                            input.form-control#ngayBatDau(type="date" name="ngayBatDau" value=formatDateInput(booking.ngayBatDau))
+
+                        .col-md-6.mb-3
+                            label.form-label(for="ngayKetThuc") Ngày kết thúc
+                            input.form-control#ngayKetThuc(type="date" name="ngayKetThuc" value=formatDateInput(booking.ngayKetThuc))
+
+                        .col-md-6.mb-3
+                            label.form-label(for="donGia") Đơn giá (VND/đêm)
+                            input.form-control#donGia(type="number" name="donGia" value=booking.donGia)
+
+                        .col-md-6.mb-3
+                            label.form-label(for="trangThai") Trạng thái
+                            select.form-select#trangThai(name="trangThai")
+                                option(value="1" selected=booking.trangThai === 1) Đang hoạt động
+                                option(value="2" selected=booking.trangThai === 2) Đã hoàn thành
+                                option(value="0" selected=booking.trangThai === 0) Đã hủy
+                    
+                    .mt-3
+                        button.btn.btn-primary(type="submit")
+                            i.fas.fa-save.me-1
+                            | Lưu thay đổi
+                        a.btn.btn-secondary.ms-2(href="/admin/bookings")
+                            i.fas.fa-times.me-1
+                            | Hủy
+
+block scripts
+    style.
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(0.95); }
+            70% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes progress {
+            from { width: 100%; }
+            to { width: 0%; }
+        }
+        
+        .custom-toast {
+            position: relative;
+            opacity: 1;
+            background: #fff;
+            margin-bottom: 16px;
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            align-items: stretch;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.15), 0 5px 10px -5px rgba(0,0,0,0.1);
+            animation: slideInRight 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+            max-width: 100%;
+            transform-origin: right center;
+            backdrop-filter: blur(10px);
+        }
+        
+        .custom-toast.closing {
+            animation: slideOutRight 0.5s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards;
+        }
+        
+        .toast-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 60px;
+            font-size: 26px;
+            padding: 0 5px;
+            animation: pulse 0.6s ease-in-out;
+        }
+        
+        .toast-content {
+            flex-grow: 1;
+            padding: 16px 15px;
+            position: relative;
+        }
+        
+        .toast-title {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 6px;
+            letter-spacing: 0.2px;
+        }
+        
+        .toast-message {
+            font-size: 14px;
+            opacity: 0.85;
+            line-height: 1.5;
+            margin-right: 20px;
+        }
+        
+        .toast-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: transparent;
+            border: none;
+            font-size: 18px;
+            width: 24px;
+            height: 24px;
+            line-height: 1;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            padding: 0;
+        }
+        
+        .toast-close:hover {
+            opacity: 1;
+            background: rgba(0,0,0,0.05);
+            transform: rotate(90deg);
+        }
+        
+        .toast-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            width: 100%;
+            background: rgba(255,255,255,0.4);
+        }
+        
+        .toast-progress-bar {
+            height: 100%;
+            width: 100%;
+        }
+        
+        /* Gradient backgrounds for different types */
+        .toast-success {
+            border-left: none;
+            background: linear-gradient(145deg, #ffffff, #f8f9fa);
+        }
+        
+        .toast-success .toast-icon {
+            background: linear-gradient(145deg, #28a745, #218838);
+            color: white;
+        }
+        
+        .toast-success .toast-progress-bar {
+            background: linear-gradient(90deg, #28a745, #5cb85c);
+            animation: progress 5s linear forwards;
+        }
+        
+        .toast-error {
+            border-left: none;
+            background: linear-gradient(145deg, #ffffff, #f8f9fa);
+        }
+        
+        .toast-error .toast-icon {
+            background: linear-gradient(145deg, #dc3545, #c82333);
+            color: white;
+        }
+        
+        .toast-error .toast-progress-bar {
+            background: linear-gradient(90deg, #dc3545, #f55a4e);
+            animation: progress 5s linear forwards;
+        }
+        
+        .toast-warning {
+            border-left: none;
+            background: linear-gradient(145deg, #ffffff, #f8f9fa);
+        }
+        
+        .toast-warning .toast-icon {
+            background: linear-gradient(145deg, #ffc107, #e0a800);
+            color: #212529;
+        }
+        
+        .toast-warning .toast-progress-bar {
+            background: linear-gradient(90deg, #ffc107, #ffdb4a);
+            animation: progress 5s linear forwards;
+        }
+        
+        .toast-info {
+            border-left: none;
+            background: linear-gradient(145deg, #ffffff, #f8f9fa);
+        }
+        
+        .toast-info .toast-icon {
+            background: linear-gradient(145deg, #17a2b8, #138496);
+            color: white;
+        }
+        
+        .toast-info .toast-progress-bar {
+            background: linear-gradient(90deg, #17a2b8, #4fbcce);
+            animation: progress 5s linear forwards;
+        }
+
+    script.
+        // Hệ thống thông báo
+        class NotificationSystem {
+            constructor() {
+                this.container = document.getElementById('notificationContainer');
+                this.counter = 0;
+                this.notifications = {};
+            }
+            
+            // Hiển thị thông báo
+            show(message, options = {}) {
+                const { 
+                    type = 'success', 
+                    title = this._getDefaultTitle(type),
+                    icon = this._getDefaultIcon(type),
+                    duration = 5000 
+                } = options;
+                
+                const id = `toast-${++this.counter}`;
+                
+                // Tạo toast element
+                const toast = document.createElement('div');
+                toast.className = `custom-toast toast-${type}`;
+                toast.id = id;
+                toast.innerHTML = `
+                    <div class="toast-icon">
+                        <i class="${icon}"></i>
+                    </div>
+                    <div class="toast-content">
+                        <div class="toast-title">${title}</div>
+                        <div class="toast-message">${message}</div>
+                        <button type="button" class="toast-close" aria-label="Đóng">
+                            <i class="fas fa-times"></i>
+                        </button>
+                        <div class="toast-progress">
+                            <div class="toast-progress-bar"></div>
+                        </div>
+                    </div>
+                `;
+                
+                // Thêm vào container
+                this.container.appendChild(toast);
+                
+                // Lưu tham chiếu để có thể hủy nếu cần
+                this.notifications[id] = {
+                    element: toast,
+                    timeout: null
+                };
+                
+                // Thêm sự kiện click cho nút đóng
+                const closeBtn = toast.querySelector('.toast-close');
+                closeBtn.addEventListener('click', () => {
+                    this._hideToast(id);
+                });
+                
+                // Tự động ẩn sau duration
+                if (duration > 0) {
+                    // Cài đặt thời gian đóng thông báo
+                    this.notifications[id].timeout = setTimeout(() => {
+                        this._hideToast(id);
+                    }, duration);
+                    
+                    // Cập nhật thời gian của progress bar
+                    const progressBar = toast.querySelector('.toast-progress-bar');
+                    progressBar.style.animationDuration = `${duration}ms`;
+                }
+                
+                return id;
+            }
+            
+            // Ẩn thông báo
+            _hideToast(id) {
+                const notification = this.notifications[id];
+                if (!notification) return;
+                
+                const { element, timeout } = notification;
+                
+                // Xóa timeout nếu có
+                if (timeout) {
+                    clearTimeout(timeout);
+                }
+                
+                // Thêm class closing để bắt đầu animation ẩn
+                element.classList.add('closing');
+                
+                // Xóa sau khi animation hoàn thành
+                setTimeout(() => {
+                    if (element.parentNode) {
+                        element.parentNode.removeChild(element);
+                    }
+                    delete this.notifications[id];
+                }, 500); // Thời gian bằng với thời gian của animation slideOutRight
+            }
+            
+            // Ẩn tất cả thông báo
+            hideAll() {
+                Object.keys(this.notifications).forEach(id => {
+                    this._hideToast(id);
+                });
+            }
+            
+            // Lấy tiêu đề mặc định theo loại
+            _getDefaultTitle(type) {
+                switch(type) {
+                    case 'success': return 'Thành công!';
+                    case 'error': return 'Lỗi!';
+                    case 'warning': return 'Cảnh báo!';
+                    case 'info': return 'Thông tin';
+                    default: return 'Thông báo';
+                }
+            }
+            
+            // Lấy icon mặc định theo loại
+            _getDefaultIcon(type) {
+                switch(type) {
+                    case 'success': return 'fas fa-check-circle';
+                    case 'error': return 'fas fa-times-circle';
+                    case 'warning': return 'fas fa-exclamation-triangle';
+                    case 'info': return 'fas fa-info-circle';
+                    default: return 'fas fa-bell';
+                }
+            }
+            
+            // Hiển thị thông báo thành công
+            success(message, options = {}) {
+                return this.show(message, { ...options, type: 'success' });
+            }
+            
+            // Hiển thị thông báo lỗi
+            error(message, options = {}) {
+                return this.show(message, { ...options, type: 'error' });
+            }
+            
+            // Hiển thị cảnh báo
+            warning(message, options = {}) {
+                return this.show(message, { ...options, type: 'warning' });
+            }
+            
+            // Hiển thị thông tin
+            info(message, options = {}) {
+                return this.show(message, { ...options, type: 'info' });
+            }
+        }
+
+        // Khởi tạo hệ thống thông báo
+        const notifications = new NotificationSystem();
+
+        // Hiển thị thông báo từ cookie
+        document.addEventListener('DOMContentLoaded', function() {
+            const getCookie = (name) => {
+                const value = `; ${document.cookie}`;
+                const parts = value.split(`; ${name}=`);
+                if (parts.length === 2) return parts.pop().split(';').shift();
+            };
+            
+            const adminMessage = getCookie('adminMessage');
+            const adminError = getCookie('adminError');
+            
+            // Hiển thị thông báo thành công
+            if (adminMessage) {
+                const message = decodeURIComponent(adminMessage);
+                notifications.success(message);
+                document.cookie = 'adminMessage=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            }
+            
+            // Hiển thị thông báo lỗi
+            if (adminError) {
+                const message = decodeURIComponent(adminError);
+                notifications.error(message);
+                document.cookie = 'adminError=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            }
+        });
+
+        // Tính toán thành tiền khi ngày hoặc đơn giá thay đổi
+        function calculateTotal() {
+            const startDate = new Date(document.getElementById('ngayBatDau').value);
+            const endDate = new Date(document.getElementById('ngayKetThuc').value);
+            const price = parseFloat(document.getElementById('donGia').value);
+            
+            if (!isNaN(startDate) && !isNaN(endDate) && !isNaN(price)) {
+                const nights = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24));
+                if (nights > 0) {
+                    const total = nights * price;
+                    // Nếu có field thành tiền, cập nhật nó
+                    const totalField = document.getElementById('thanhTien');
+                    if (totalField) {
+                        totalField.value = total;
+                    }
+                }
+            }
+        }
+        
+        // Gán sự kiện cho các trường nhập
+        document.addEventListener('DOMContentLoaded', function() {
+            const startDateField = document.getElementById('ngayBatDau');
+            const endDateField = document.getElementById('ngayKetThuc');
+            const priceField = document.getElementById('donGia');
+            
+            if (startDateField && endDateField && priceField) {
+                startDateField.addEventListener('change', calculateTotal);
+                endDateField.addEventListener('change', calculateTotal);
+                priceField.addEventListener('input', calculateTotal);
+            }
+            
+            // Tính toán ban đầu
+            calculateTotal();
+        }); 

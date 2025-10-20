@@ -1,0 +1,148 @@
+doctype html
+html
+  head
+    meta(charset="utf-8")
+    style.
+      @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+      
+      body {
+        font-family: 'Roboto', Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        color: #333;
+        background-color: #f9f9f9;
+      }
+      
+      .container {
+        font-family: Arial, sans-serif;
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+      }
+      
+      .header {
+        background: linear-gradient(135deg, #1e88e5, #0d47a1);
+        padding: 20px;
+        color: white;
+        text-align: center;
+        border-radius: 10px 10px 0 0;
+      }
+      
+      .title {
+        font-size: 24px;
+        margin-bottom: 10px;
+      }
+      
+      .subtitle {
+        font-size: 16px;
+        margin: 0;
+      }
+      
+      .content {
+        padding: 20px;
+      }
+      
+      .section-title {
+        color: #1e88e5;
+        font-size: 20px;
+        margin-bottom: 15px;
+      }
+      
+      .detail-row {
+        margin-bottom: 10px;
+      }
+      
+      .detail-label {
+        font-weight: bold;
+      }
+      
+      .qr-container {
+        text-align: center;
+        margin: 20px 0;
+      }
+      
+      .qr-image {
+        max-width: 200px;
+      }
+      
+      .attachment-notice {
+        text-align: center;
+        margin: 20px 0;
+        padding: 15px;
+        background-color: #f5f5f5;
+        border-radius: 8px;
+      }
+      
+      .attachment-title {
+        margin-bottom: 15px;
+        font-weight: bold;
+      }
+      
+      .footer {
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid #ddd;
+      }
+      
+      .contact-info {
+        margin-top: 10px;
+      }
+      
+  body
+    .container
+      .header
+        h1.title Xác nhận đặt phòng
+        p.subtitle Cảm ơn bạn đã đặt phòng tại khách sạn của chúng tôi
+      
+      .content
+        h2.section-title Thông tin đặt phòng
+        
+        .detail-row
+          span.detail-label Mã đặt phòng: 
+          span ##{booking.idDatPhong}
+        
+        .detail-row
+          span.detail-label Khách hàng: 
+          span #{booking.hoTen}
+        
+        .detail-row
+          span.detail-label Khách sạn: 
+          span #{booking.tenKhachSan}
+        
+        .detail-row
+          span.detail-label Địa chỉ: 
+          span #{booking.diaChi}
+        
+        .detail-row
+          span.detail-label Phòng: 
+          span #{booking.idPhong} - #{booking.loaiPhong}
+        
+        .detail-row
+          span.detail-label Ngày nhận phòng: 
+          span #{formatDate(booking.ngayBatDau)}
+        
+        .detail-row
+          span.detail-label Ngày trả phòng: 
+          span #{formatDate(booking.ngayKetThuc)}
+        
+        .detail-row
+          span.detail-label Số đêm: 
+          span #{nights} đêm
+        
+        .detail-row
+          span.detail-label Tổng tiền: 
+          span #{formatCurrency(booking.thanhTien || (booking.donGia * nights))}
+        
+        .qr-container
+          p Quét mã QR này khi đến nhận phòng:
+          img.qr-image(src=qrCodeURL, alt="Mã QR xác nhận đặt phòng")
+        
+        .attachment-notice
+          p.attachment-title Hóa đơn PDF đã được đính kèm theo email này.
+          p Vui lòng kiểm tra tệp đính kèm để xem chi tiết hóa đơn của bạn.
+        
+        .footer
+          p Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi:
+          p.contact-info Email: support@example.com | Điện thoại: 0123 456 789 

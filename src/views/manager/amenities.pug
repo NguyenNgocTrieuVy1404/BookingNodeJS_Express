@@ -1,0 +1,564 @@
+extends ../layoutManager
+
+block content
+    #notificationContainer.position-fixed.top-0.end-0.p-3(style="z-index: 1060; max-width: 380px;")
+        // Thông báo sẽ được thêm vào đây bằng JavaScript
+
+    .container-fluid.p-4
+        .card.shadow-sm
+            .card-header.bg-white.py-3.d-flex.justify-content-between.align-items-center
+                h5.card-title.mb-0
+                    i.fas.fa-concierge-bell.me-2.text-primary
+                    | Quản lý Tiện nghi
+                button.btn.btn-primary.btn-sm(data-bs-toggle="modal" data-bs-target="#addAmenityModal")
+                    i.fas.fa-plus.me-1
+                    | Thêm tiện nghi
+
+            .card-body
+                .table-responsive
+                    table.table.table-hover.align-middle.mb-0
+                        thead.table-light
+                            tr
+                                th ID
+                                th Tên tiện nghi
+                                th Số phòng sử dụng
+                                th.text-end Thao tác
+                        tbody
+                            each amenity in amenities || []
+                                tr
+                                    td= amenity.idTienNghi
+                                    td= amenity.tenTienNghi
+                                    td= amenity.totalRooms
+                                    td.text-end
+                                        button.btn.btn-sm.btn-outline-primary.me-2(onclick=`openEditModal(${amenity.idTienNghi}, "${amenity.tenTienNghi}")`)
+                                            i.fas.fa-edit.me-1
+                                            | Sửa
+                                        button.btn.btn-sm.btn-outline-danger(onclick=`deleteAmenity(${amenity.idTienNghi})`)
+                                            i.fas.fa-trash.me-1
+                                            | Xóa
+
+    // Modal thêm tiện nghi
+    #addAmenityModal.modal.fade
+        .modal-dialog
+            .modal-content
+                .modal-header
+                    h5.modal-title Thêm tiện nghi mới
+                    button.btn-close(data-bs-dismiss="modal")
+                .modal-body
+                    form#addAmenityForm(onsubmit="return handleAddAmenity(event)")
+                        .mb-3
+                            label.form-label(for="tenTienNghi") Tên tiện nghi
+                            input.form-control#tenTienNghi(type="text" name="tenTienNghi" required)
+                        button.btn.btn-primary.w-100(type="submit") 
+                            i.fas.fa-plus.me-2
+                            | Thêm tiện nghi
+
+    // Modal sửa tiện nghi
+    #editAmenityModal.modal.fade
+        .modal-dialog
+            .modal-content
+                .modal-header
+                    h5.modal-title Sửa tiện nghi
+                    button.btn-close(data-bs-dismiss="modal")
+                .modal-body
+                    form#editAmenityForm(onsubmit="return handleEditAmenity(event)")
+                        input#editAmenityId(type="hidden" name="idTienNghi")
+                        .mb-3
+                            label.form-label(for="editTenTienNghi") Tên tiện nghi
+                            input.form-control#editTenTienNghi(type="text" name="tenTienNghi" required)
+                        button.btn.btn-primary.w-100(type="submit") 
+                            i.fas.fa-save.me-2
+                            | Lưu thay đổi
+
+block scripts
+    style.
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(0.95); }
+            70% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes progress {
+            from { width: 100%; }
+            to { width: 0%; }
+        }
+        
+        .custom-toast {
+            position: relative;
+            opacity: 1;
+            background: #fff;
+            margin-bottom: 16px;
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            align-items: stretch;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.15), 0 5px 10px -5px rgba(0,0,0,0.1);
+            animation: slideInRight 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+            max-width: 100%;
+            transform-origin: right center;
+            backdrop-filter: blur(10px);
+        }
+        
+        .custom-toast.closing {
+            animation: slideOutRight 0.5s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards;
+        }
+        
+        .toast-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 60px;
+            font-size: 26px;
+            padding: 0 5px;
+            animation: pulse 0.6s ease-in-out;
+        }
+        
+        .toast-content {
+            flex-grow: 1;
+            padding: 16px 15px;
+            position: relative;
+        }
+        
+        .toast-title {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 6px;
+            letter-spacing: 0.2px;
+        }
+        
+        .toast-message {
+            font-size: 14px;
+            opacity: 0.85;
+            line-height: 1.5;
+            margin-right: 20px;
+        }
+        
+        .toast-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: transparent;
+            border: none;
+            font-size: 18px;
+            width: 24px;
+            height: 24px;
+            line-height: 1;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            padding: 0;
+        }
+        
+        .toast-close:hover {
+            opacity: 1;
+            background: rgba(0,0,0,0.05);
+            transform: rotate(90deg);
+        }
+        
+        .toast-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            width: 100%;
+            background: rgba(255,255,255,0.4);
+        }
+        
+        .toast-progress-bar {
+            height: 100%;
+            width: 100%;
+        }
+        
+        /* Gradient backgrounds for different types */
+        .toast-success {
+            border-left: none;
+            background: linear-gradient(145deg, #ffffff, #f8f9fa);
+        }
+        
+        .toast-success .toast-icon {
+            background: linear-gradient(145deg, #28a745, #218838);
+            color: white;
+        }
+        
+        .toast-success .toast-progress-bar {
+            background: linear-gradient(90deg, #28a745, #5cb85c);
+            animation: progress 5s linear forwards;
+        }
+        
+        .toast-error {
+            border-left: none;
+            background: linear-gradient(145deg, #ffffff, #f8f9fa);
+        }
+        
+        .toast-error .toast-icon {
+            background: linear-gradient(145deg, #dc3545, #c82333);
+            color: white;
+        }
+        
+        .toast-error .toast-progress-bar {
+            background: linear-gradient(90deg, #dc3545, #f55a4e);
+            animation: progress 5s linear forwards;
+        }
+        
+        .toast-warning {
+            border-left: none;
+            background: linear-gradient(145deg, #ffffff, #f8f9fa);
+        }
+        
+        .toast-warning .toast-icon {
+            background: linear-gradient(145deg, #ffc107, #e0a800);
+            color: #212529;
+        }
+        
+        .toast-warning .toast-progress-bar {
+            background: linear-gradient(90deg, #ffc107, #ffdb4a);
+            animation: progress 5s linear forwards;
+        }
+        
+        .toast-info {
+            border-left: none;
+            background: linear-gradient(145deg, #ffffff, #f8f9fa);
+        }
+        
+        .toast-info .toast-icon {
+            background: linear-gradient(145deg, #17a2b8, #138496);
+            color: white;
+        }
+        
+        .toast-info .toast-progress-bar {
+            background: linear-gradient(90deg, #17a2b8, #4fbcce);
+            animation: progress 5s linear forwards;
+        }
+
+    script.
+        // Hệ thống thông báo
+        class NotificationSystem {
+            constructor() {
+                this.container = document.getElementById('notificationContainer');
+                this.counter = 0;
+                this.notifications = {};
+            }
+            
+            // Hiển thị thông báo
+            show(message, options = {}) {
+                const { 
+                    type = 'success', 
+                    title = this._getDefaultTitle(type),
+                    icon = this._getDefaultIcon(type),
+                    duration = 5000 
+                } = options;
+                
+                const id = `toast-${++this.counter}`;
+                
+                // Tạo toast element
+                const toast = document.createElement('div');
+                toast.className = `custom-toast toast-${type}`;
+                toast.id = id;
+                toast.innerHTML = `
+                    <div class="toast-icon">
+                        <i class="${icon}"></i>
+                    </div>
+                    <div class="toast-content">
+                        <div class="toast-title">${title}</div>
+                        <div class="toast-message">${message}</div>
+                        <button type="button" class="toast-close" aria-label="Đóng">
+                            <i class="fas fa-times"></i>
+                        </button>
+                        <div class="toast-progress">
+                            <div class="toast-progress-bar"></div>
+                        </div>
+                    </div>
+                `;
+                
+                // Thêm vào container
+                this.container.appendChild(toast);
+                
+                // Lưu tham chiếu để có thể hủy nếu cần
+                this.notifications[id] = {
+                    element: toast,
+                    timeout: null
+                };
+                
+                // Thêm sự kiện click cho nút đóng
+                const closeBtn = toast.querySelector('.toast-close');
+                closeBtn.addEventListener('click', () => {
+                    this._hideToast(id);
+                });
+                
+                // Tự động ẩn sau duration
+                if (duration > 0) {
+                    // Cài đặt thời gian đóng thông báo
+                    this.notifications[id].timeout = setTimeout(() => {
+                        this._hideToast(id);
+                    }, duration);
+                    
+                    // Cập nhật thời gian của progress bar
+                    const progressBar = toast.querySelector('.toast-progress-bar');
+                    progressBar.style.animationDuration = `${duration}ms`;
+                }
+                
+                return id;
+            }
+            
+            // Ẩn thông báo
+            _hideToast(id) {
+                const notification = this.notifications[id];
+                if (!notification) return;
+                
+                const { element, timeout } = notification;
+                
+                // Xóa timeout nếu có
+                if (timeout) {
+                    clearTimeout(timeout);
+                }
+                
+                // Thêm class closing để bắt đầu animation ẩn
+                element.classList.add('closing');
+                
+                // Xóa sau khi animation hoàn thành
+                setTimeout(() => {
+                    if (element.parentNode) {
+                        element.parentNode.removeChild(element);
+                    }
+                    delete this.notifications[id];
+                }, 500); // Thời gian bằng với thời gian của animation slideOutRight
+            }
+            
+            // Ẩn tất cả thông báo
+            hideAll() {
+                Object.keys(this.notifications).forEach(id => {
+                    this._hideToast(id);
+                });
+            }
+            
+            // Lấy tiêu đề mặc định theo loại
+            _getDefaultTitle(type) {
+                switch(type) {
+                    case 'success': return 'Thành công!';
+                    case 'error': return 'Lỗi!';
+                    case 'warning': return 'Cảnh báo!';
+                    case 'info': return 'Thông tin';
+                    default: return 'Thông báo';
+                }
+            }
+            
+            // Lấy icon mặc định theo loại
+            _getDefaultIcon(type) {
+                switch(type) {
+                    case 'success': return 'fas fa-check-circle';
+                    case 'error': return 'fas fa-times-circle';
+                    case 'warning': return 'fas fa-exclamation-triangle';
+                    case 'info': return 'fas fa-info-circle';
+                    default: return 'fas fa-bell';
+                }
+            }
+            
+            // Hiển thị thông báo thành công
+            success(message, options = {}) {
+                return this.show(message, { ...options, type: 'success' });
+            }
+            
+            // Hiển thị thông báo lỗi
+            error(message, options = {}) {
+                return this.show(message, { ...options, type: 'error' });
+            }
+            
+            // Hiển thị cảnh báo
+            warning(message, options = {}) {
+                return this.show(message, { ...options, type: 'warning' });
+            }
+            
+            // Hiển thị thông tin
+            info(message, options = {}) {
+                return this.show(message, { ...options, type: 'info' });
+            }
+        }
+
+        // Khởi tạo hệ thống thông báo
+        const notifications = new NotificationSystem();
+
+        // Hiển thị thông báo từ cookie
+        document.addEventListener('DOMContentLoaded', function() {
+            const getCookie = (name) => {
+                const value = `; ${document.cookie}`;
+                const parts = value.split(`; ${name}=`);
+                if (parts.length === 2) return parts.pop().split(';').shift();
+            };
+            
+            const managerMessage = getCookie('managerMessage');
+            const managerError = getCookie('managerError');
+            
+            // Hiển thị thông báo thành công
+            if (managerMessage) {
+                const message = decodeURIComponent(managerMessage);
+                notifications.success(message);
+                document.cookie = 'managerMessage=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            }
+            
+            // Hiển thị thông báo lỗi
+            if (managerError) {
+                const message = decodeURIComponent(managerError);
+                notifications.error(message);
+                document.cookie = 'managerError=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            }
+        });
+
+        // Mở modal sửa tiện nghi
+        function openEditModal(idTienNghi, tenTienNghi) {
+            document.getElementById('editAmenityId').value = idTienNghi;
+            document.getElementById('editTenTienNghi').value = tenTienNghi;
+            
+            const modal = new bootstrap.Modal(document.getElementById('editAmenityModal'));
+            modal.show();
+        }
+
+        // Xử lý thêm tiện nghi
+        async function handleAddAmenity(event) {
+            event.preventDefault();
+            
+            const tenTienNghi = document.getElementById('tenTienNghi').value;
+            const submitBtn = event.target.querySelector('button[type="submit"]');
+            
+            try {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Đang xử lý...';
+
+                const response = await fetch('/manager/amenities/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ tenTienNghi })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    notifications.success('Thêm tiện nghi thành công!');
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1200);
+                } else {
+                    throw new Error(data.message || 'Không thể thêm tiện nghi');
+                }
+
+            } catch (error) {
+                notifications.error(error.message);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-plus me-2"></i>Thêm tiện nghi';
+            }
+
+            return false;
+        }
+
+        // Xử lý sửa tiện nghi
+        async function handleEditAmenity(event) {
+            event.preventDefault();
+            
+            const idTienNghi = document.getElementById('editAmenityId').value;
+            const tenTienNghi = document.getElementById('editTenTienNghi').value;
+            const submitBtn = event.target.querySelector('button[type="submit"]');
+            const modalElement = document.getElementById('editAmenityModal');
+            
+            // Kiểm tra dữ liệu trước khi gửi
+            if (!tenTienNghi.trim()) {
+                notifications.error('Tên tiện nghi không được để trống!');
+                return false;
+            }
+            
+            try {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Đang xử lý...';
+                
+                const response = await fetch(`/manager/amenities/edit/${idTienNghi}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ tenTienNghi })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Hiển thị thông báo thành công
+                    notifications.success('Cập nhật tiện nghi thành công!');
+                    
+                    // Đóng modal an toàn
+                    const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                    if (modalInstance) {
+                        modalInstance.hide();
+                    }
+                    
+                    // Reload trang sau 1.2 giây
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1200);
+                } else {
+                    throw new Error(data.message || 'Không thể cập nhật tiện nghi');
+                }
+                
+            } catch (error) {
+                console.error('Lỗi khi cập nhật tiện nghi:', error);
+                notifications.error(error.message || 'Đã xảy ra lỗi khi cập nhật tiện nghi');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-save me-2"></i>Lưu thay đổi';
+            }
+            
+            return false;
+        }
+
+        // Xử lý xóa tiện nghi
+        async function deleteAmenity(idTienNghi) {
+            if (!confirm('Bạn có chắc muốn xóa tiện nghi này?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/manager/amenities/delete/${idTienNghi}`, {
+                    method: 'POST'
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message);
+                }
+
+                notifications.success('Xóa tiện nghi thành công!');
+                setTimeout(() => {
+                    location.reload();
+                }, 1200);
+
+            } catch (error) {
+                notifications.error(error.message);
+            }
+        }

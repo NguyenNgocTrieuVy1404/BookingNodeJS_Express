@@ -1,0 +1,72 @@
+extends ../layoutAdmin
+
+block content
+    .container-fluid.p-4
+        .card.shadow-sm
+            .card-header.bg-white.py-3.d-flex.justify-content-between.align-items-center
+                h5.card-title.mb-0
+                    i.fas.fa-hotel.me-2.text-primary
+                    | Danh sách khách sạn
+                a.btn.btn-primary.btn-sm(href="/admin/hotels/add")
+                    i.fas.fa-plus.me-1
+                    | Thêm khách sạn
+
+            .card-body
+                .table-responsive
+                    table.table.table-hover.align-middle.mb-0
+                        thead.table-light
+                            tr
+                                th.border-0 ID
+                                th.border-0 Tên khách sạn
+                                th.border-0 Phường
+                                th.border-0 Quận
+                                th.border-0 Thành phố
+                                th.border-0 Thao tác
+                        tbody
+                            each hotel in hotels
+                                tr
+                                    td= hotel.idKhachSan
+                                    td
+                                        .d-flex.align-items-center
+                                            .avatar.bg-light.rounded-circle.p-2.me-2
+                                                i.fas.fa-hotel.text-primary
+                                            = hotel.tenKhachSan
+                                    td= hotel.phuong
+                                    td= hotel.quan
+                                    td= hotel.thanhPho
+                                    td.text-end
+                                        a.btn.btn-sm.btn-outline-primary.me-2(href=`/admin/hotels/edit/${hotel.idKhachSan}`)
+                                            i.fas.fa-edit.me-1
+                                            | Sửa
+                                        button.btn.btn-danger(onclick=`deleteHotel(${hotel.idKhachSan})`) 
+                                            i.fas.fa-trash
+                                            | Xóa
+
+block scripts
+    script.
+        async function deleteHotel(idKhachSan) {
+            if (!confirm('Bạn có chắc muốn xóa khách sạn này?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/admin/hotels/${idKhachSan}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert(result.message);
+                    window.location.reload();
+                } else {
+                    alert(result.message || 'Có lỗi xảy ra khi xóa');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Có lỗi kết nối đến server');
+            }
+        }

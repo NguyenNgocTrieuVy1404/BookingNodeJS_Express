@@ -1,0 +1,191 @@
+extends layouts/layout
+
+block styles
+  style.
+    .auth-container {
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      padding: 20px 0;
+      min-height: calc(100vh - 400px);
+    }
+    .card {
+      border: none;
+      border-radius: 15px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      background: rgba(255, 255, 255, 0.95);
+      transition: transform 0.3s ease;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+    }
+    .card-title {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #2b3d51;
+      margin-bottom: 30px;
+    }
+    .form-control {
+      border-radius: 10px;
+      padding: 12px;
+      border: 2px solid #e1e5ea;
+      transition: all 0.3s ease;
+    }
+    .form-control:focus {
+      box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.2);
+      border-color: #28a745;
+    }
+    .btn-primary {
+      padding: 12px;
+      border-radius: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      background: linear-gradient(45deg, #28a745, #218838);
+      border: none;
+      transition: all 0.3s ease;
+    }
+    .btn-primary:hover {
+      background: linear-gradient(45deg, #218838, #1e7e34);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+    }
+    .auth-link {
+      color: #28a745;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+    .auth-link:hover {
+      color: #218838;
+      text-decoration: underline;
+    }
+    .input-group {
+      position: relative;
+    }
+    .input-icon {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #6c757d;
+      cursor: pointer;
+    }
+    .card-body {
+      padding: 20px;
+    }
+    .error-message {
+      font-size: 0.85rem;
+      color: #dc3545;
+    }
+    .is-invalid {
+      border-color: #dc3545 !important;
+    }
+
+block content
+  .auth-container
+    .row.justify-content-center
+      .col-md-5
+        .card
+          .card-body.p-5
+            h3.card-title.text-center Đăng ký
+            form#registerForm(action='/users/register' method='POST' onsubmit="return validateRegisterForm(event)")
+              .mb-4
+                label.form-label(for='hoTen') Họ và tên
+                .input-group
+                  input.form-control(
+                    type='text' 
+                    name='hoTen' 
+                    id='hoTen' 
+                    placeholder='Nhập họ và tên'
+                  )
+                  i.fas.fa-user.input-icon
+              .mb-4
+                label.form-label(for='tenDangNhap') Tên đăng nhập
+                .input-group
+                  input.form-control(
+                    type='text' 
+                    name='tenDangNhap' 
+                    id='tenDangNhap' 
+                    placeholder='Nhập tên đăng nhập'
+                  )
+                  i.fas.fa-user.input-icon
+              .mb-4
+                label.form-label(for='matKhau') Mật khẩu
+                .input-group
+                  input.form-control(
+                    type='password' 
+                    name='matKhau'
+                    id='registerPassword' 
+                    placeholder='Nhập mật khẩu'
+                  )
+                  i.fas.fa-eye.input-icon#toggleRegisterPasswordIcon
+              .mb-4
+                label.form-label(for='confirmPassword') Xác nhận mật khẩu
+                .input-group
+                  input.form-control(
+                    type='password' 
+                    name='confirmPassword' 
+                    id='confirmPassword' 
+                    placeholder='Nhập lại mật khẩu'
+                  )
+                  i.fas.fa-eye.input-icon#toggleConfirmPasswordIcon
+              .mb-4
+                label.form-label(for='email') Email
+                .input-group
+                  input.form-control(
+                    type='email' 
+                    name='email' 
+                    id='email' 
+                    placeholder='Nhập email'
+                  )
+                  i.fas.fa-envelope.input-icon
+              .mb-4
+                label.form-label(for='soDienThoai') Số điện thoại
+                .input-group
+                  input.form-control(
+                    type='tel' 
+                    name='soDienThoai' 
+                    id='soDienThoai' 
+                    placeholder='Nhập số điện thoại'
+                  )
+                  i.fas.fa-phone.input-icon
+              button.btn.btn-primary.w-100.mb-4(type='submit')
+                i.fas.fa-user-plus.me-2
+                | Đăng ký
+            .text-center
+              a.auth-link(href='/users/login') Đã có tài khoản? Đăng nhập ngay
+
+block scripts
+  script(src='/js/user-validate.js')
+  script.
+    document.getElementById('toggleRegisterPasswordIcon').addEventListener('click', function() {
+      const password = document.getElementById('registerPassword');
+      const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+      password.setAttribute('type', type);
+      this.classList.toggle('fa-eye');
+      this.classList.toggle('fa-eye-slash');
+    });
+
+    document.getElementById('toggleConfirmPasswordIcon').addEventListener('click', function() {
+      const confirmPassword = document.getElementById('confirmPassword');
+      const type = confirmPassword.getAttribute('type') === 'password' ? 'text' : 'password';
+      confirmPassword.setAttribute('type', type);
+      this.classList.toggle('fa-eye');
+      this.classList.toggle('fa-eye-slash');
+    });
+
+    const searchInput = document.querySelector('.search-input');
+    searchInput.addEventListener('input', async function(e) {
+        if (e.target.value.length > 0) {
+            try {
+                const response = await fetch(`/locations/${e.target.value}`);
+                const data = await response.json();
+                if (data.success) {
+                    // Xử lý hiển thị kết quả tìm kiếm
+                    console.log(data.data);
+                }
+            } catch (error) {
+                console.error('Lỗi khi tìm kiếm:', error);
+            }
+        }
+    });
