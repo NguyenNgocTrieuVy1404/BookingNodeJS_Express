@@ -1,76 +1,63 @@
 # Hệ Thống Đặt Phòng Khách Sạn - Node.js Express
 
 ## Mô tả
-Website đặt phòng khách sạn toàn diện được xây dựng bằng Node.js Express với MySQL. Dự án học tập tích hợp đầy đủ chức năng từ đặt phòng, quản lý khách sạn đến báo cáo và thanh toán.
+Website đặt phòng khách sạn được xây dựng bằng Node.js Express với MySQL. Dự án học tập tích hợp đặt phòng, quản lý khách sạn, báo cáo, gửi email xác nhận và xuất PDF.
 
 ## Chức năng chính
 - ✅ **Đặt phòng khách sạn**: Tìm kiếm và đặt phòng theo ngày
 - ✅ **Quản lý khách sạn**: Admin quản lý khách sạn, phòng, tiện nghi
 - ✅ **Quản lý đặt phòng**: Manager quản lý booking của khách sạn
-- ✅ **Xác thực người dùng**: Đăng ký, đăng nhập với JWT
-- ✅ **Gửi email**: Xác nhận đặt phòng qua email
-- ✅ **Tạo PDF**: Xuất hóa đơn và voucher
-- ✅ **QR Code**: Tạo mã QR cho booking
-- ✅ **Upload ảnh**: Quản lý hình ảnh khách sạn
-- ✅ **Scheduled Jobs**: Tự động hủy booking hết hạn
+- ✅ **Xác thực**: Đăng ký / đăng nhập (JWT + cookie), **đăng nhập Google (OAuth 2.0)** qua Passport.js
+- ✅ **Gửi email**: Xác nhận đặt phòng qua email (Nodemailer)
+- ✅ **PDF / voucher**: Xuất hóa đơn và nội dung email HTML (html-pdf, template Pug)
+- ✅ **Upload ảnh**: Quản lý hình ảnh khách sạn (Multer)
+- ✅ **Scheduled Jobs**: Tự động hủy booking hết hạn (node-cron)
 
 ## Cấu trúc dự án
 
 ### Node.js Express Application
 ```
 BookingNodeJS_Express/
-├── app.js                     # Main application file
-├── package.json               # Dependencies và scripts
-├── Hotel_DB.sql              # Database schema
+├── app.js                     # Khởi tạo Express, session, Passport
+├── package.json
+├── Hotel_DB.sql               # Schema MySQL
 ├── src/
-│   ├── controllers/          # Business logic
-│   │   ├── BookingController.js
-│   │   ├── HotelController.js
-│   │   ├── AdminController.js
-│   │   ├── ManagerController.js
-│   │   └── authController.js
-│   ├── models/               # Data models
-│   │   ├── bookingModel.js
-│   │   ├── hotelModel.js
-│   │   ├── userModel.js
-│   │   └── adminModel.js
-│   ├── routes/               # API routes
+│   ├── controllers/
+│   ├── models/
+│   ├── routes/
+│   │   ├── authRouter.js      # Google OAuth (/auth/google, ...)
+│   │   ├── userRoute.js       # Đăng ký, đăng nhập, đăng xuất
 │   │   ├── bookingRoute.js
 │   │   ├── hotelRoute.js
+│   │   ├── homeRoute.js
+│   │   ├── locationRoute.js
+│   │   ├── profileRoute.js
 │   │   ├── adminRoute.js
-│   │   └── authRouter.js
-│   ├── middleware/           # Custom middleware
+│   │   ├── managerRouter.js
+│   │   └── staticRoute.js
+│   ├── middleware/
 │   │   └── authMiddleware.js
-│   ├── utils/                # Utility functions
-│   │   ├── connectDB.js       # Database connection
-│   │   ├── passport.js        # Authentication
-│   │   ├── pdfGenerator.js    # PDF generation
-│   │   ├── qrGenerator.js     # QR code generation
-│   │   └── scheduler.js       # Cron jobs
-│   └── views/                # Pug templates
-│       ├── home.pug
-│       ├── booking-form.pug
-│       ├── admin/
-│       └── manager/
-└── public/                   # Static files
-    ├── css/
-    ├── js/
-    └── hotels/
+│   ├── utils/
+│   │   ├── connectDB.js
+│   │   ├── passport.js        # Google OAuth strategy
+│   │   ├── pdfGenerator.js / documentGenerator.js
+│   │   ├── scheduler.js
+│   │   └── uploadConfig.js
+│   └── views/                 # Pug templates
+└── public/
 ```
 
 ## Công nghệ sử dụng
-- **Node.js** - Runtime environment
-- **Express.js** - Web framework
-- **MySQL** - Database
-- **Pug** - Template engine
-- **JWT** - Authentication
-- **Passport.js** - Authentication middleware
-- **Multer** - File upload
-- **Nodemailer** - Email service
-- **html-pdf** - PDF generation
-- **qrcode** - QR code generation
-- **node-cron** - Scheduled tasks
-- **bcrypt** - Password hashing
+- **Node.js**, **Express.js**
+- **MySQL** (mysql2)
+- **Pug** — template engine
+- **JWT** + **cookie-parser** — đăng nhập form qua `UserController`
+- **express-session** + **Passport.js** + **passport-google-oauth20** — đăng nhập Google (`passport.js` hiện chỉ đăng ký Google strategy; `passport-local` có trong `package.json` nhưng chưa được `passport.use` tại đây)
+- **Multer** — upload file
+- **Nodemailer** — email
+- **html-pdf** — PDF
+- **node-cron** — tác vụ theo lịch
+- **bcrypt** — mã hóa mật khẩu
 
 ## Cài đặt
 
@@ -93,7 +80,8 @@ mysql -u root -p < Hotel_DB.sql
 ```
 
 ### 4. Cấu hình environment
-Tạo file `.env`:
+Tạo file `.env` ở thư mục gốc dự án:
+
 ```env
 DB_HOST=localhost
 DB_USER=root
@@ -101,10 +89,13 @@ DB_PASSWORD=your_password
 DB_NAME=dbdatphongks
 DB_PORT=3306
 PORT=3000
-JWT_SECRET=....
+JWT_SECRET=your_jwt_secret
+SESSION_SECRET=your_session_secret
+
+# Đăng nhập Google: OAuth client + redirect http://localhost:3000/auth/google/callback (Google Cloud Console)
 GOOGLE_CLIENT_ID=
 GOOGLE_CLIENT_SECRET=
-SESSION_SECRET=your_secret_key
+
 EMAIL_USER=your_email@gmail.com
 EMAIL_PASS=your_app_password
 ```
@@ -113,7 +104,7 @@ EMAIL_PASS=your_app_password
 ```bash
 npm start
 ```
-Truy cập: http://localhost:3000
+Mặc định: `http://localhost:3000` (hoặc cổng trong `PORT`).
 
 ## Cấu trúc database
 
@@ -131,71 +122,62 @@ Truy cập: http://localhost:3000
 ## Cách sử dụng
 
 ### 1. Khách hàng
-- **Đăng ký/Đăng nhập**: Tạo tài khoản hoặc đăng nhập
-- **Tìm kiếm**: Tìm khách sạn theo địa điểm và ngày
+- **Đăng ký / đăng nhập**: `/users/register`, `/users/login`; có thể dùng **Đăng nhập Google** qua liên kết tới `/auth/google` (nếu đã cấu hình OAuth).
+- **Tìm kiếm**: Khách sạn theo địa điểm và ngày
 - **Đặt phòng**: Chọn phòng và điền thông tin
-- **Xem booking**: Xem lịch sử đặt phòng
-- **Hủy booking**: Hủy đặt phòng (trước ngày check-in)
+- **Xem booking**: Lịch sử đặt phòng
+- **Hủy booking**: Trước ngày check-in (theo luật nghiệp vụ trong ứng dụng)
 
 ### 2. Admin
-- **Quản lý khách sạn**: Thêm/sửa/xóa khách sạn
-- **Quản lý phòng**: Quản lý phòng và tiện nghi
-- **Quản lý user**: Quản lý tài khoản người dùng
-- **Quản lý booking**: Xem tất cả đặt phòng
-- **Dashboard**: Thống kê tổng quan
+- Quản lý khách sạn, phòng, user, booking, dashboard
 
 ### 3. Manager
-- **Quản lý khách sạn**: Quản lý khách sạn được phân công
-- **Quản lý phòng**: Quản lý phòng của khách sạn
-- **Quản lý booking**: Xem đặt phòng của khách sạn
-- **Cập nhật tiện nghi**: Thêm/sửa tiện nghi phòng
+- Quản lý khách sạn được phân công, phòng, booking, tiện nghi
 
-## API Endpoints
+## Một số route HTTP (tham khảo)
 
-### Authentication
-- `POST /auth/register` - Đăng ký
-- `POST /auth/login` - Đăng nhập
-- `POST /auth/logout` - Đăng xuất
+Ứng dụng chủ yếu render Pug; dưới đây là các nhóm route chính (một phần cần đăng nhập / JWT).
 
-### Booking
-- `GET /bookings` - Lấy danh sách booking
-- `POST /bookings` - Tạo booking mới
-- `POST /bookings/:id/cancel` - Hủy booking
+### Người dùng (local)
+- `GET/POST /users/register` — form đăng ký
+- `GET/POST /users/login` — form đăng nhập
+- `GET /users/logout` — đăng xuất
 
-### Hotels
-- `GET /hotels` - Lấy danh sách khách sạn
-- `GET /hotels/:id` - Chi tiết khách sạn
-- `POST /hotels` - Tạo khách sạn (Admin)
+### Google OAuth
+- `GET /auth/google`, `GET /auth/google/callback`, `GET /auth/google/failure`
+
+### Booking (nhiều route có middleware `verifyToken`)
+- `GET /bookings` — danh sách booking của user
+- `GET /bookings/book/:idPhong` — form đặt phòng
+- `POST /bookings` — tạo booking
+- `POST /bookings/:id/cancel` — hủy
+- `GET /bookings/success/:id` — trang thành công
+- `POST /bookings/:id/send-email` — gửi lại email xác nhận
+
+### Khách sạn (ví dụ)
+- `GET /hotels` — API/danh sách
+- `GET /hotels/:id` — chi tiết (có `checkAuth`)
 
 ## Tính năng nổi bật
 
 ### 1. Authentication & Authorization
-- JWT token authentication
-- Role-based access control (User, Manager, Admin)
-- Session management với Passport.js
+- JWT (cookie `httpOnly`) cho phiên sau đăng nhập form hoặc sau OAuth
+- Phân quyền User / Manager / Admin
+- Session + Passport cho luồng Google OAuth
 
-### 2. File Management
-- Upload hình ảnh khách sạn với Multer
-- Generate PDF hóa đơn và voucher
-- QR code generation cho booking
+### 2. File & tài liệu
+- Upload ảnh khách sạn (Multer)
+- PDF hóa đơn / voucher và HTML email (template Pug)
 
-### 3. Email Service
-- Gửi email xác nhận đặt phòng
-- Template email với Pug
-- Nodemailer integration
+### 3. Email & lịch
+- Nodemailer, template email
+- Cron: xử lý booking hết hạn
 
-### 4. Scheduled Tasks
-- Tự động hủy booking hết hạn
-- Cron jobs với node-cron
-- Background task processing
-
-### 5. Database Optimization
-- Connection pooling với MySQL2
-- Prepared statements
-- Transaction support
+### 4. Database
+- MySQL2, pooling, truy vấn tham số hóa
 
 ## Lưu ý
-- Đây là dự án học tập Node.js Express
-- Cần cấu hình email service để gửi email
-- Database cần được setup trước khi chạy
-- Phù hợp để học full-stack development
+- Dự án học tập; cần import `Hotel_DB.sql` và điền `.env` trước khi chạy.
+- **Email**: cần `EMAIL_USER` / `EMAIL_PASS` (ví dụ mật khẩu ứng dụng Gmail) để gửi xác nhận.
+- **Google OAuth**: không điền `GOOGLE_CLIENT_ID` / `SECRET` thì chức năng đăng nhập Google sẽ lỗi khi gọi `/auth/google`.
+- Callback Google đang hardcode `localhost:3000` trong `src/utils/passport.js` — khi chạy domain/cổng khác phải sửa cho khớp URI đã đăng ký trên Google.
